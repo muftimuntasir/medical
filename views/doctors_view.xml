@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="doctors_view" model="ir.ui.view">
+            <field name="name">doctors.profile.views</field>
+            <field name="model">doctors.profile</field>
+            <field name="arch" type="xml">
+            <form string="Doctors">
+                <sheet>
+
+                    <group>
+
+                        <field name="doctor_id"/>
+                        <field name="name"/>
+                        <field name="referral_id"/>
+                        <field name="department"/>
+                        <field name="designation"/>
+                        <field name="degree"/>
+                        <field name="ipd_visit"/>
+                        <field name="commission_rate"/>
+                        <field name="type"/>
+                        <field name="status"/>
+                        <field name="others"/>
+                        <field name="is_referral"/>
+                        <field name="broker_ids" widget="many2many_tags"/>
+
+                    </group>
+                    <notebook>
+                        <page string="Bill Register">
+                            <field name="bill_info">
+                                <group>
+                                <field name="total"/>
+                                </group>
+
+                            </field>
+                        </page>
+                        <page string="Admission Info">
+                            <field name="admission_info">
+                             <field name="name"/>
+                            <field name="patient_name"/>
+                            <field name="mobile"/>
+
+                            </field>
+
+
+
+
+                        </page>
+                        <page string="Commission">
+                             <field name="commission">
+                                 <field name="name"/>
+
+                                <field name="commission_configuration_id"/>
+
+                                <field name="total_amount"/>
+                             </field>
+
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+        <record id="doctors_action" model="ir.actions.act_window">
+            <field name="name">Doctors profile</field>
+            <field name="res_model">doctors.profile</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="doctors_tree" >
+            <field name="name">doctors.profile.tree</field>
+            <field name="model">doctors.profile</field>
+            <field name="arch" type="xml">
+            <tree string="Alu List">
+                        <field name="name"/>
+                        <field name="department"/>
+                        <field name="designation"/>
+                        <field name="commission_rate"/>
+                        <field name="type"/>
+                        <field name="status"/>
+                        <field name="others"/>
+                        <field name="last_commission_calculation_date"/>
+
+            </tree>
+            </field>
+        </record>
+
+
+<!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
+        <menuitem name="Profile" id="leih_profile_menu" parent="leih_menu" sequence="5"/>
+        <menuitem name="Doctors" id="doctors_menu_mainform" parent="leih_profile_menu" action="doctors_action" groups="leih.group_profile_menu_doctors"/>
+
+
+    </data>
+</odoo>

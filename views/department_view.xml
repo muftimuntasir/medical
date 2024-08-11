@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="dep_view" model="ir.ui.view">
+            <field name="name">diagnosis.views</field>
+            <field name="model">diagnosis.department</field>
+            <field name="arch" type="xml">
+            <form string="Room">
+                <sheet>
+
+                    <group>
+
+                        <field name="name"/>
+                        <field name="parent"/>
+
+                    </group>
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+
+
+        <record id="dep_action" model="ir.actions.act_window">
+            <field name="name">Department</field>
+            <field name="res_model">diagnosis.department</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.ui.view" id="dep_tree" >
+            <field name="name">diagnosis</field>
+            <field name="model">diagnosis.department</field>
+            <field name="arch" type="xml">
+            <tree string="Alu List">
+                        <field name="name"/>
+                        <field name="parent"/>
+
+
+            </tree>
+            </field>
+        </record>
+
+
+
+        <menuitem name="Department" id="dep_menu_mainform" parent="leih_config_menu" action="dep_action" groups="leih.group_configuration_menu_department"/>
+
+
+    </data>
+</odoo>
