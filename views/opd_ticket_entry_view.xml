@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_opd_ticket_entry_form" model="ir.ui.view">
+            <field name="name">opd.ticket.entry.form</field>
+            <field name="model">opd.ticket.entry</field>
+            <field name="arch" type="xml">
+                <form string="OPD Ticket Entry">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="department"/>
+                                <field name="fee"/>
+                                <field name="accounts_id"/>
+                                <field name="total_cash"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_opd_ticket_entry_tree" model="ir.ui.view">
+            <field name="name">opd.ticket.entry.tree</field>
+            <field name="model">opd.ticket.entry</field>
+            <field name="arch" type="xml">
+                <tree string="OPD Ticket Entry">
+                    <field name="name"/>
+                    <field name="department"/>
+                    <field name="fee"/>
+                    <field name="accounts_id"/>
+                    <field name="total_cash"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_opd_ticket_entry_search" model="ir.ui.view">
+            <field name="name">opd.ticket.entry.search</field>
+            <field name="model">opd.ticket.entry</field>
+            <field name="arch" type="xml">
+                <search string="OPD Ticket Entry">
+                    <field name="name" string="OPD Ticket Entry"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_opd_ticket_entry" model="ir.actions.act_window">
+            <field name="name">OPD Ticket Entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">opd.ticket.entry</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_opd_ticket_entry_search"/>
+            <field name="view_id" ref="view_opd_ticket_entry_tree"/>
+        </record>
+
+        <menuitem id="menu_opd_ticket_entry"
+                  name="OPD Ticket Entry"
+                  sequence="1"
+                  parent="medical.menu_medical"
+                  action="action_opd_ticket_entry"
+        />
+
+    </data>
+</odoo>
+
