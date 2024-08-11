@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_opd_ticket_form" model="ir.ui.view">
+            <field name="name">opd.ticket.form</field>
+            <field name="model">opd.ticket</field>
+            <field name="arch" type="xml">
+                <form string="OPD Ticket">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_opd_ticket_tree" model="ir.ui.view">
+            <field name="name">opd.ticket.tree</field>
+            <field name="model">opd.ticket</field>
+            <field name="arch" type="xml">
+                <tree string="OPD Ticket">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_opd_ticket_search" model="ir.ui.view">
+            <field name="name">opd.ticket.search</field>
+            <field name="model">opd.ticket</field>
+            <field name="arch" type="xml">
+                <search string="OPD Ticket">
+                    <field name="name" string="OPD Ticket"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_opd_ticket" model="ir.actions.act_window">
+            <field name="name">OPD Ticket</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">opd.ticket</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_opd_ticket_search"/>
+            <field name="view_id" ref="view_opd_ticket_tree"/>
+        </record>
+
+        <menuitem id="menu_opd_ticket"
+                  name="OPD Ticket"
+                  sequence="1"
+                  parent="medical.menu_medical"
+                  action="action_opd_ticket"
+        />
+
+    </data>
+</odoo>
+

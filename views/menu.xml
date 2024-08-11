@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <menuitem id="menu_medical"
+                  name="Medical"
+                  sequence="10"
+        />
+
+    </data>
+</odoo>
