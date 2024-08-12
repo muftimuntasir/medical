@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+   <data>
+
+
+
+        <record id="delivered_report" model="ir.actions.act_window">
+            <field name="name">Stickered</field>
+            <field name="res_model">diagnosis.sticker</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="domain">[('state','=','delivered')]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="delivery_report_tree">
+            <field name="name">leih</field>
+            <field name="model">diagnosis.sticker</field>
+            <field name="arch" type="xml">
+             <tree string="Alu List">
+                        <field name="name"/>
+                        <field name="full_name"/>
+                        <field name="bill_register_id"/>
+                 <field name="admission_id"/>
+                        <field name="department_id"/>
+                        <field name="state"/>
+
+
+
+            </tree>
+            </field>
+        </record>
+
+
+
+
+
+    </data>
+</odoo>
