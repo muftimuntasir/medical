@@ -139,16 +139,16 @@ class Sample(models.Model):
 
 
 
-    name = fields.char('No #')
-    full_name = fields.char('Name')
-    bill_register_id =fields.many2one('bill.register','Bill register')
-    admission_id =fields.many2one('leih.admission','Admission ID')
-    general_admission_id =fields.many2one('hospital.admission','Admission ID')
-    department_id =fields.char('Department')
-    doctor_id =fields.many2one('doctors.profile','Checked By')
-    test_id =fields.many2one('examination.entry','Test Name')
-    sticker_line_id =fields.one2many('diagnosis.sticker.line','sticker_id','Record Sample')
-    state = fields.selection(
+    name = fields.Char('No #')
+    full_name = fields.Char('Name')
+    bill_register_id =fields.Many2one('bill.register','Bill register')
+    admission_id =fields.Many2one('leih.admission','Admission ID')
+    general_admission_id =fields.Many2one('hospital.admission','Admission ID')
+    department_id =fields.Char('Department')
+    doctor_id =fields.Many2one('doctors.profile','Checked By')
+    test_id =fields.Many2one('examination.entry','Test Name')
+    sticker_line_id =fields.One2many('diagnosis.sticker.line','sticker_id','Record Sample')
+    state = fields.Selection(
         [('cancel', 'Cancelled'), ('sample', 'Sample'), ('lab', 'Lab'),('done', 'Done'),('delivered','Delivered'),('indoor','Indoor')],
         'Status', required=True, readonly=True, copy=False,
         )
@@ -159,10 +159,10 @@ class TestSample(models.Model):
     _name = "diagnosis.sticker.line"
 
 
-    test_name = fields.char("Name")
-    sticker_id =fields.many2one('diagnosis.sticker','ID')
-    result = fields.char('Result')
-    ref_value = fields.char('Reference Value')
-    bold =fields.boolean('Bold')
-    group_by =fields.boolean('Group By')
-    remarks = fields.char('Remarks')
+    test_name = fields.Char("Name")
+    sticker_id =fields.Many2one('diagnosis.sticker','ID')
+    result = fields.Char('Result')
+    ref_value = fields.Char('Reference Value')
+    bold =fields.Boolean('Bold')
+    group_by =fields.Boolean('Group By')
+    remarks = fields.Char('Remarks')
