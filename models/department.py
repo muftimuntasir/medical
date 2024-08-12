@@ -1,9 +1,8 @@
 from odoo import api, models, fields
 
-class diagnostic_department(models.Model):
-    _name = "diagnostic.department"
+class DiagnosticDepartment(models.Model):
+    _name = "diagnosis.department"
+    _description = "Department name Entry"
 
-
-
-    name= fields.Char("Department Name",required=True)
-    parent=fields.Many2one('diagnosis.department','parent')
+    name = fields.Char("Department Name")
+    parent_id = fields.Many2one('diagnosis.department','Parent')

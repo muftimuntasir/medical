@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_opd_ticket,opd.ticket,model_opd_ticket,base.group_user,1,1,1,1
 access_opd_ticket_entry,opd.ticket.entry,model_opd_ticket_entry,base.group_user,1,1,1,1
 access_opd_ticket_line,opd.ticket.line,model_opd_ticket_line,base.group_user,1,1,1,1
+
+access_diagnosis_department,diagnosis.department,model_diagnosis_department,base.group_user,1,1,1,1

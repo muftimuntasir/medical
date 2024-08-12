@@ -20,6 +20,7 @@
         'views/menu.xml',
         'views/opd_ticket_view.xml',
         'views/opd_ticket_entry_view.xml',
+        'views/department_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,
