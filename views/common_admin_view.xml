@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+            <record id="sample_view" model="ir.ui.view">
+                <field name="name">diagnosis.view</field>
+                <field name="model">diagnosis.sticker</field>
+                <field name="arch" type="xml">
+                <form string="Investigation">
+                    <header>
+                        <button name="print_sticker" string="Print Sticker" type="object" />
+                        <button name="print_lab_report" string="Complete and Print Report" type="object" />
+                        <button name="set_to_lab" string="Set to Lab" type="object" />
+                        <button name="set_to_sample" string="Set to Sample" type="object" />
+                        <button string="Haematology" type="object" name="haematology_report" groups="base.group_user"/>
+                        <button string="Serology" type="object" name="serology_report" groups="base.group_user"/>
+                        <button string="Microbiology" type="object" name="microbiology_report" groups="base.group_user"/>
+                        <button string="Biochemistry" type="object" name="biochemistry_report" groups="base.group_user"/>
+                        <button string="Urine" type="object" name="urine_report" groups="base.group_user"/>
+                        <button string="Stool" type="object" name="stool_report" groups="base.group_user"/>
+                        <button string="Complete Reporting" type="object" name="done_radiology" groups="base.group_user"/>
+                        <button string="Make Delivered" type="object" name="delivered" groups="base.group_user"/>
+                    </header>
+
+                    <sheet>
+
+                        <group>
+                            <field name="name"/>
+                            <field name="full_name"/>
+                            <field name="test_id"/>
+                            <field name="bill_register_id"/>
+                            <field name="admission_id"/>
+                            <field name="department_id"/>
+                            <field name="doctor_id"/>
+                        </group>
+                        <notebook>
+                            <page string="Referance Value">
+                                <field name="sticker_line_id" mode="tree">
+                                    <tree string="Select Referance Value" editable="top">
+                                        <field name="test_name"/>
+                                        <field name="result"/>
+                                        <field name="ref_value"/>
+                                        <field name="bold"/>
+                                        <field name="group_by"/>
+                                        <field name="remarks"/>
+                                    </tree>
+                                </field>
+                            </page>
+
+                        </notebook>
+
+                    </sheet>
+                </form>
+
+                </field>
+
+            </record>
+
+             <record model="ir.ui.view" id="sticker_graph_view">
+                    <field name="name">LAB Graph</field>
+                    <field name="model">diagnosis.sticker</field>
+                    <field name="arch" type="xml">
+                        <graph string="">
+                            <field name="department_id"/>
+
+                        </graph>
+                    </field>
+            </record>
+
+
+
+            <record id="common_admins" model="ir.actions.act_window">
+                <field name="name">For All</field>
+                <field name="res_model">diagnosis.sticker</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form,graph</field>
+                <field name="context">{}</field>
+            </record>
+
+            <!-- expense type tree -->
+            <record model="ir.ui.view" id="report_tree">
+                <field name="name">leih</field>
+                <field name="model">diagnosis.sticker</field>
+                <field name="arch" type="xml">
+                 <tree string="Alu List">
+                            <field name="test_id"/>
+                            <field name="full_name"/>
+                            <field name="name"/>
+                            <field name="bill_register_id"/>
+                            <field name="admission_id"/>
+                            <field name="department_id"/>
+                            <field name="state"/>
+
+
+
+                </tree>
+                </field>
+            </record>
+
+
+
+
+    <!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
+            <menuitem name="Common Admin" id="common_admin_menu" parent="leih_reportreceiption_menu" action="common_admins" groups="leih.group_report_reception_menu_common_admin"/>
+
+
+        </data>
+
+</odoo>

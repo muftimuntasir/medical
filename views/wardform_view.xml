@@ -1,0 +1,64 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+
+        <record id="group_view" model="ir.ui.view">
+            <field name="name">ward.managment.view</field>
+            <field name="model">ward.managment</field>
+            <field name="arch" type="xml">
+            <form string="ward">
+                <sheet>
+
+                    <group>
+                        <table>
+
+                        <field name="wname"/>
+                        <field name="bed"/>
+                        <field name="pid"/>
+                        <field name="Date"/>
+                        <field name="precived"/>
+                        </table>
+
+                    </group>
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+        <record id="ward_action" model="ir.actions.act_window">
+            <field name="name">ward managment</field>
+            <field name="res_model">ward.managment</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="ward_tree" >
+            <field name="name">ward.managment.tree</field>
+            <field name="model">ward.managment</field>
+            <field name="arch" type="xml">
+            <tree string="ward List">
+                        <field name="wname"/>
+                        <field name="bed"/>
+                        <field name="pid"/>
+                        <field name="Date"/>
+                        <field name="precived"/>
+
+
+
+            </tree>
+            </field>
+        </record>
+
+
+<!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
+        <menuitem name="Ward" id="ward_menu_mainform" parent="leih_group_menu" action="ward_action" groups="leih.group_hospital_menu_ward"/>
+    </data>
+
+</odoo>
