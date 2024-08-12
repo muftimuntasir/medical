@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="blood_donor_view_form" model="ir.ui.view">
+            <field name="name">blood.donor.form</field>
+            <field name="model">blood.donor</field>
+            <field name="arch" type="xml">
+                <form string="Blood Donor">
+                    <sheet>
+                        <group>
+                            <field name="date"/>
+                            <field name="donor_name"/>
+                            <field name="mobile_no"/>
+                            <field name="description"/>
+                            <field name="group"/>
+                            <field name="cost"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="blood_donor_tree_view" model="ir.ui.view">
+            <field name="name">blood.donor.tree</field>
+            <field name="model">blood.donor</field>
+            <field name="arch" type="xml">
+                <tree string="Blood Donor List">
+                    <field name="name"/>
+                    <field name="donor_name"/>
+                    <field name="mobile_no"/>
+                    <field name="date"/>
+                    <field name="description"/>
+                    <field name="group"/>
+                    <field name="cost"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="blood_donor_action" model="ir.actions.act_window">
+            <field name="name">Blood Donor</field>
+            <field name="res_model">blood.donor</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- Menu -->
+        <menuitem name="Blood Bank" id="leih_blood_menu" parent="leih_menu" sequence="6"/>
+        <menuitem name="Blood Donor" id="blood_donor_menu_mainform" parent="leih_blood_menu" action="blood_donor_action" groups="leih.group_blood_bank_menu_donor"/>
+    </data>
+</odoo>

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="cash_collection_view" model="ir.ui.view">
+            <field name="name">cash.collection.view</field>
+            <field name="model">cash.collection</field>
+            <field name="arch" type="xml">
+            <form string="Cash Collection">
+                <header>
+                    <button name="action_button_confirm" string="Confirm" type="object" groups="leih.group_hospital_button_confirm"/>
+                    <button name="action_button_cancel" string="Cancel" type="object" groups="leih.group_hospital_button_cancel"/>
+                </header>
+                <sheet>
+
+                    <group>
+                        <field name="date"/>
+                        <field name="type"/>
+                        <field name="debit_act_id"/>
+                        <field name="credit_act_id"/>
+                        <field name="total"/>
+
+                    </group>
+                    <notebook>
+                    <page string="Cash Collection Details">
+                            <field name="cash_collection_lines" mode="tree">
+                                <tree string="Select Referance Value" editable="top">
+
+                                    <field name="mr_no"/>
+                                    <field name="opd_id"/>
+                                    <field name="bill_admission_opd_id"/>
+                                    <field name="amount"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+                    </notebook>
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+        <record model="ir.ui.view" id="cc_graph_view">
+                <field name="name">Cash Collection Graph</field>
+                <field name="model">cash.collection</field>
+                <field name="arch" type="xml">
+                    <graph string="Cash Collection Overview">
+                        <field name="type"/>
+                        <!-- Add additional fields or measures if needed -->
+                    </graph>
+                </field>
+        </record>
+
+
+        <record id="cash_collection_action" model="ir.actions.act_window">
+            <field name="name">Cash Collection</field>
+            <field name="res_model">cash.collection</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.ui.view" id="cash_collection_tree" >
+            <field name="name">cash.collection.tree</field>
+            <field name="model">cash.collection</field>
+            <field name="arch" type="xml">
+            <tree string="Cash Collection List">
+                        <field name="name"/>
+                        <field name="date"/>
+                        <field name="type"/>
+                        <field name="total"/>
+                        <field name="journal_id"/>
+                        <field name="state"/>
+            </tree>
+            </field>
+        </record>
+
+        <report
+                id="action_cc_collection_u_report"
+                model="cash.collection"
+                string="Cash Collection Report"
+                report_type="qweb-pdf"
+                name="leih.report_cc_collection"
+                file="leih.report_cc_collection"
+                menu="False"
+        />
+
+        <report
+                id="action_detail_component_u_report"
+                model="cash.collection"
+                string="Detailed Component Report"
+                report_type="qweb-pdf"
+                name="leih.report_detail_component"
+                file="leih.report_detail_component"
+                menu="False"
+        />
+
+         <report
+                id="action_optics_daily_u_collection"
+                model="cash.collection"
+                string="Optics Daily Collection"
+                report_type="qweb-pdf"
+                name="leih.report_optics_collection"
+                file="leih.report_optics_collection"
+                menu="False"
+        />
+
+    </data>
+</odoo>

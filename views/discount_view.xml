@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="discount_view" model="ir.ui.view">
+            <field name="name">discount.views</field>
+            <field name="model">discount</field>
+            <field name="arch" type="xml">
+            <form string="Investigation">
+                <header>
+                    <button string="Approve" type="object" name="approve_discount" groups="base.group_user"/>
+                    <button string="Cancel" type="object" name="cancel_discount" groups="base.group_user"/>
+                    </header>
+
+                <sheet>
+                    <group>
+                        <field name="date"/>
+                        <field name="bill_no" on_change="onchange_bill(bill_no, context)"/>
+                        <field name="admission_id" on_change="onchange_admission(admission_id, context)"/>
+                        <field name="patient_name"/>
+                        <field name="mobile"/>
+                        <field name="state"/>
+                    </group>
+                     <notebook>
+                        <page string="Referance Value">
+
+                            <field name="discount_line_id" mode="tree">
+                                <tree string="Select Referance Value" editable="top">
+                                    <field name="category" on_change="onchange_category(category, context)"/>
+                                    <field name="ref"/>
+                                    <field name="accounts"/>
+                                    <field name="fixed_amount"/>
+                                    <field name="percent_amount"/>
+                                </tree>
+                            </field>
+                        </page>
+                     </notebook>
+                    <group>
+                        <field name="amount"/>
+                        <field name="total_discount"/>
+                    </group>
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+
+
+        <record id="discount_action" model="ir.actions.act_window">
+            <field name="name">Discount</field>
+            <field name="res_model">discount</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+
+        <record model="ir.ui.view" id="discount_tree">
+            <field name="name">Discount</field>
+            <field name="model">discount</field>
+            <field name="arch" type="xml">
+            <tree string="Alu List">
+
+                        <field name="name"/>
+                        <field name="bill_no"/>
+                        <field name="admission_id"/>
+                        <field name="patient_name"/>
+                        <field name="mobile"/>
+                        <field name="amount"/>
+                        <field name="total_discount"/>
+                        <field name="state"/>
+
+
+            </tree>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!--commission form-->
+        <record model="ir.ui.view" id="commission_payment_form_view" >
+			<field name="name">Commission Payment</field>
+			<field name="model">commission.payment</field>
+            <field name="arch" type="xml">
+                <form string="Commission Payment">
+                    <header>
+
+
+
+                    </header>
+
+                    <sheet>
+                        <h1>
+                            <label string="Commission Payment"/>
+                        </h1>
+                        <group string="Basic Information">
+                            <group>
+                                <field name="id" invisible="1"/>
+                                <field name="date"/>
+                                <field name="doctor_id"/>
+                                <field name="cc_id"/>
+                                <field name="debit_id"/>
+                                <field name="credit_id"/>
+                                <field name="paid_amount"/>
+                                <field name="due_amount"/>
+                                <field name="period_id"/>
+                                <field name="note"/>
+
+                            </group>
+
+                        </group>
+                        <footer>
+                        <button name="button_add_payment_action" string="Pay" class="oe_highlight" type="object"/> or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="commission_p_graph_view">
+                <field name="name">Commission PaymentGraph</field>
+                <field name="model">commission.payment</field>
+                <field name="arch" type="xml">
+                    <graph string="">
+                        <field name="doctor_id"/>
+                    </graph>
+                </field>
+        </record>
+
+
+        <!--commission starting action-->
+        <record model="ir.actions.act_window" id="commission_payment_new_action" >
+			<field name="name">Commission Payment List</field>
+			<field name="res_model">commission.payment</field>
+			<field name="view_mode">tree,form,graph</field>
+			<field name="context" eval="{'search_default_my_courses': 1}"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Click to create a new Commission Payment list.
+				</p>
+			</field>
+		</record>
+
+
+
+        <!--commission record list tree-->
+        <record model="ir.ui.view" id="commission_payment_tree_view" >
+            <field name="name">commission.payment.tree</field>
+            <field name="model">commission.payment</field>
+            <field name="arch" type="xml">
+                <tree string="Commission Payment List">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="date"/>
+                    <field name="doctor_id"/>
+                    <field name="cc_id"/>
+                    <field name="debit_id"/>
+                    <field name="credit_id"/>
+                    <field name="paid_amount"/>
+                    <field name="due_amount"/>
+                    <field name="period_id"/>
+                    <field name="note"/>
+                    <field name="journal_id"/>
+
+
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="main_commissionpaymentlist_menu" name="Commission Payment"/>
+
+        <menuitem id="commissionpaymentlist_menu" name="Commission Payment" parent="main_commissionpaymentlist_menu"/>
+        <menuitem id="courses_menu3" name="Commission Payment" parent="main_commissionpaymentlist_menu" action="commission_payment_new_action"/>
+
+
+        <menuitem name="Commission Payment list" id="main_commissionpaymentlist_menu"
+            groups="base.group_sale_salesman"
+            parent="base.menu_base_partner" sequence="10" />
+
+
+
+
+
+
+
+
+    </data>
+</odoo>

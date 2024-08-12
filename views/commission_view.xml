@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!--commission form-->
+        <record model="ir.ui.view" id="commission_form_view" >
+			<field name="name">Commission List Generation</field>
+			<field name="model">commission</field>
+            <field name="arch" type="xml">
+                <form string="Commission">
+                    <header>
+                        <button string="Confirm" type="object" name="confirm_commission" groups="base.group_user"/>
+                        <button string="Cancel" type="object" name="cancel_commission" groups="base.group_user"/>
+                        <button string="Add payment" type="object" name="btn_pay_bill" groups="base.group_user"/>
+
+
+
+
+
+                    </header>
+
+                    <sheet>
+                        <h1>
+                            <label string="Commission Calculation"/>
+                        </h1>
+                        <group string="Basic Information">
+                            <group>
+                                <field name="cal_st_date"/>
+                                <field name="cal_end_date"/>
+                                <field name="id" invisible="1"/>
+                                <field name="ref_doctors"/>
+                                <field name="commission_configuration_id"/>
+
+                                <field name="total_amount"/>
+                                <field name="given_discount_amount"/>
+                                <field name="total_payable_amount"/>
+                                <field name="total_bill"/>
+                                <field name="total_tests" />
+                                <field name="state" />
+                            </group>
+
+                        </group>
+
+                        <!--Tab information-->
+                        <notebook>
+
+                            <page string="Commission Products">
+                                <field name="commission_line_ids" mode="tree">
+                                    <tree string="Commission Products" editable="top">
+                                        <field name="department_id"/>
+                                        <field name="bill_line_id"/>
+                                        <field name="name"/>
+                                        <field name="discount_amount"/>
+                                        <field name="test_amount"/>
+                                        <field name="mou_payable_comm_var"/>
+                                        <field name="mou_payable_comm_fixed"/>
+                                        <field name="mou_payable_comm_max_cap"/>
+                                        <field name="after_discount"/>
+                                        <field name="payable_amount"/>
+
+                                    </tree>
+                                </field>
+                            </page>
+
+
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="commission_graph_view">
+                <field name="name">Commission Graph</field>
+                <field name="model">commission</field>
+                <field name="arch" type="xml">
+                    <graph string="">
+                        <field name="ref_doctors"/>
+                    </graph>
+                </field>
+        </record>
+
+
+        <!--commission starting action-->
+        <record model="ir.actions.act_window" id="commission_new_action" >
+			<field name="name">Commission List</field>
+			<field name="res_model">commission</field>
+			<field name="view_mode">tree,form,graph</field>
+			<field name="context" eval="{'search_default_my_courses': 1}"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Click to create a new commission list.
+				</p>
+			</field>
+		</record>
+
+
+
+        <!--commission record list tree-->
+        <record model="ir.ui.view" id="commission_tree_view" >
+            <field name="name">commission.tree</field>
+            <field name="model">commission</field>
+            <field name="arch" type="xml">
+                <tree string="Commission List">
+                    <field name="id"/>
+                    <field name="name"/>
+                    <field name="ref_doctors"/>
+                    <field name="commission_configuration_id"/>
+                    <field name="cal_st_date"/>
+                    <field name="cal_end_date"/>
+                    <field name="total_amount"/>
+                    <field name="total_payable_amount"/>
+                    <field name="paid_amount"/>
+                    <field name="state"/>
+
+
+
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="main_commissionlist_menu" name="Commission List"/>
+
+        <menuitem id="commissionlist_menu" name="Commission List" parent="main_commissionlist_menu"/>
+        <menuitem id="courses_menu" name="Commission List" parent="main_commissionlist_menu" action="commission_new_action"/>
+
+
+        <menuitem name="Commission list" id="main_commissionlist_menu"
+            groups="base.group_sale_salesman"
+            parent="base.menu_base_partner" sequence="4" />
+
+
+
+
+
+
+
+
+    </data>
+</odoo>

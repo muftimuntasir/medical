@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="advance_cash_view" model="ir.ui.view">
+            <field name="name">advance.cash.view</field>
+            <field name="model">advance.cash</field>
+            <field name="arch" type="xml">
+            <form string="Advacne Cash">
+                                    <header>
+
+<!--                        <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>-->
+
+                        <button string="Confirm" type="object" name="confirm_transfer" groups="base.group_user"/>
+                        <button string="Cancel" type="object" name="inventory_requsition_cancel" groups="base.group_user"/>
+                    </header>
+                <sheet>
+
+                    <group>
+                        <field name="date"/>
+                         <field name="partner_id" domain="[('customer','=',True)]"/>
+                        <field name="purpose"/>
+                        <field name="amount"/>
+                        <field name="credit_accounts"/>
+                        <field name="debit_accounts"/>
+
+
+                    </group>
+
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+        <record model="ir.ui.view" id="advance_cash_graph_view">
+                <field name="name">advance.cash Graph</field>
+                <field name="model">advance.cash</field>
+                <field name="arch" type="xml">
+                    <graph string="">
+                        <field name="name"/>
+
+                    </graph>
+                </field>
+        </record>
+
+
+
+        <record id="advance_cash_action" model="ir.actions.act_window">
+            <field name="name">Advance Cash</field>
+            <field name="res_model">advance.cash</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="advance_cash_tree" >
+            <field name="name">advance.cash</field>
+            <field name="model">advance.cash</field>
+            <field name="arch" type="xml">
+            <tree string="Issue List">
+
+                <field name="name"/>
+                <field name="date"/>
+                <field name="amount"/>
+                <field name="partner_id"/>
+                <field name="journal_id"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+
+
+
+        <menuitem name="Advance Cash" id="advance_cash_menu_mainform" parent="leih_billing_menu" action="advance_cash_action" sequence="24" groups="leih.group_hospital_menu_advance_cash"/>
+
+    </data>
+</odoo>

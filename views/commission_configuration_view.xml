@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!--commission form-->
+        <record model="ir.ui.view" id="commission_configuration_form_view" >
+			<field name="name">Commission Configuration</field>
+			<field name="model">commission.configuration</field>
+            <field name="arch" type="xml">
+                <form string="Commission Configuration">
+                    <header>
+                        <button string="Confirm" type="object" name="confirm_configuration" groups="base.group_user"/>
+                        <button string="Cancel" type="object" name="cancel_configuration" groups="base.group_user"/>
+
+                    </header>
+
+                    <sheet>
+                        <h1>
+                            <label string="Commission Configuration"/>
+                        </h1>
+                        <group string="Basic Information">
+                            <group>
+                                <field name="id" invisible="1"/>
+                                <field name="doctor_id"/>
+                                <field name="broker_id"/>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                                <field name="overall_commission_rate"/>
+                                <field name="overall_default_discount"/>
+                                <field name="max_default_discount"/>
+                                <field name="deduct_from_discount"/>
+                                <field name="department_ids"/>
+                                <field name="calculation_base_price"/>
+
+
+                            </group>
+
+                        </group>
+
+                        <!--Tab information-->
+                        <notebook>
+
+                            <page string="Configuration Lines">
+                                <field name="commission_configuration_line_ids" mode="tree">
+                                    <tree string="Configuration Lines" editable="top">
+                                        <field name="department_id"/>
+                                        <field name="test_id"/>
+                                        <field name="applicable"/>
+                                        <field name="base_price_applicable"/>
+                                        <field name="fixed_amount"/>
+                                        <field name="variance_amount"/>
+                                        <field name="test_price"/>
+                                        <field name="est_commission_amount"/>
+                                        <field name="max_commission_amount"/>
+
+
+                                    </tree>
+                                </field>
+                            </page>
+
+
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <!--commission starting action-->
+        <record model="ir.actions.act_window" id="commission_configuration_new_action" >
+			<field name="name">Commission Configuration List</field>
+			<field name="res_model">commission.configuration</field>
+			<field name="view_mode">tree,form</field>
+			<field name="context" eval="{'search_default_my_courses': 1}"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Click to create a new commission configuration list.
+				</p>
+			</field>
+		</record>
+
+
+
+        <!--commission record list tree-->
+        <record model="ir.ui.view" id="commission_configuration_tree_view" >
+            <field name="name">commission.configuration.tree</field>
+            <field name="model">commission.configuration</field>
+            <field name="arch" type="xml">
+                <tree string="Commission Configuration List">
+                    <field name="name"/>
+                    <field name="doctor_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="state"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <menuitem id="main_commissionconfigurationlist_menu" name="Commission Configuration"/>
+
+        <menuitem id="commissionconfigurationlist_menu" name="Commission Configuration" parent="main_commissionconfigurationlist_menu"/>
+        <menuitem id="courses_menu2" name="Commission Configuration" parent="main_commissionconfigurationlist_menu" action="commission_configuration_new_action"/>
+
+
+        <menuitem name="Commission Configuration list" id="main_commissionconfigurationlist_menu"
+            groups="base.group_sale_salesman"
+            parent="base.menu_base_partner" sequence="5" />
+
+
+
+
+
+
+
+
+    </data>
+</odoo>

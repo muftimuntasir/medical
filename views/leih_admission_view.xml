@@ -162,7 +162,7 @@
             </field>
         </record>
 
-        
+
         <menuitem name="Admission" id="leih_admission_menu" parent="leih_menu" sequence="2"/>
         <menuitem name="Pending Admission" id="admission_menu_mainform" parent="leih_admission_menu" action="admission_action" groups="leih.group_admission_menu_pending"/>
 

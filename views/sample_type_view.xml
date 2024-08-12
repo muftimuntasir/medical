@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="sampletypeentry_view" model="ir.ui.view">
+            <field name="name">sample.type.view</field>
+            <field name="model">sample.type</field>
+            <field name="arch" type="xml">
+            <form string="sample type Entry">
+                <sheet>
+
+                    <group>
+
+                        <field name="name"/>
+
+                    </group>
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+
+
+        <record id="sampletypeentry_action" model="ir.actions.act_window">
+            <field name="name">sample type Entry</field>
+            <field name="res_model">sample.type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="sample_tree" >
+            <field name="name">sampletype</field>
+            <field name="model">sample.type</field>
+            <field name="arch" type="xml">
+            <tree string="Testentry List">
+                        <field name="name"/>
+            </tree>
+            </field>
+        </record>
+
+    </data>
+</odoo>
