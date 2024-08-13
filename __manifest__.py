@@ -24,6 +24,7 @@
         'views/diagonosisgroup_view.xml',
         'views/examinationentry_view.xml',
         'views/sample_type_view.xml',
+        'views/exmine_package_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

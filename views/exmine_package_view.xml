@@ -4,7 +4,7 @@
     <data>
 
             <record id="examine_package_view" model="ir.ui.view">
-                <field name="name">examine.package</field>
+                <field name="name">examine.package.form</field>
                 <field name="model">examine.package</field>
                 <field name="arch" type="xml">
                 <form string="Package">
@@ -18,7 +18,7 @@
                             <field name="active"/>
                         </group>
                         <notebook>
-                            <page string="Referance Value">
+                            <page string="Reference Value">
                                 <field name="examine_package_line_id" mode="tree">
                                     <tree string="Select Referance Value" editable="top">
 
@@ -48,7 +48,7 @@
                 <field name="name">examine.package.act</field>
                 <field name="res_model">examine.package</field>
                 <field name="type">ir.actions.act_window</field>
-                <field name="view_type">form</field>
+
                 <field name="view_mode">tree,form</field>
                 <field name="context">{}</field>
             </record>
@@ -69,9 +69,17 @@
                 </field>
             </record>
 
+        <menuitem id="examine_view_menu"
+                  name="Exam Package "
+                  sequence="7"
+                  parent="medical.menu_medical"
+                  action="examine_view_action"
+        />
+
+
 
     <!--        <menuitem name="Patients" id="leih_patients_menu" parent="leih_menu"/>-->
-            <menuitem name="Package" id="package_menu_mainform" parent="leih_config_menu" action="examine_view_action" groups="leih.group_configuration_menu_package"/>
+<!--            <menuitem name="Package" id="package_menu_mainform" parent="leih_config_menu" action="examine_view_action" groups="leih.group_configuration_menu_package"/>-->
 
 
         </data>

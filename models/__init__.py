@@ -3,3 +3,4 @@ from . import department
 from . import diagnosisgroup
 from . import sample_type
 from . import examinationentry
+from . import examine_package
