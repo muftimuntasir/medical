@@ -6,3 +6,5 @@ from . import examinationentry
 from . import examine_package
 from . import blood
 from . import products_lens
+from . import patient_info
+from . import optics_sale

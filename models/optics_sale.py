@@ -52,10 +52,10 @@ class OpticsSale(models.Model):
     qty_available= fields.Integer("Stock Quantity", readonly=True)
     delivery_id =fields.Many2one('stock.picking', 'Delivery Challan')
     price= fields.Float('Price')
-    optics_lens_sale_line_id= fields.one2many('optics.lens.sale.line', 'optics_sale_id', 'Lens Entry')
-    optics_sale_payment_line_id= fields.one2many("optics.sale.payment.line", "optics_sale_payment_line_id",
+    optics_lens_sale_line_id= fields.One2many('optics.lens.sale.line', 'optics_sale_id', 'Lens Entry')
+    optics_sale_payment_line_id= fields.One2many("optics.sale.payment.line", "optics_sale_payment_line_id",
                                                   "Bill Register Payment")
-    # 'footer_connection= fields.one2many('leih.footer', 'relation', 'Parameters', required=True)
+    # 'footer_connection= fields.One2many('leih.footer', 'relation', 'Parameters', required=True)
     # 'relation= fields.Many2one("leih.investigation")
     # 'total= fields.Float(_totalpayable,string="Total",type='float',store=True)
     total= fields.Float(string="Total")
@@ -558,10 +558,10 @@ class OpticsLensInformation(models.Model):
 class AdmissionPaymentLine(models.Model):
     _name = 'optics.sale.payment.line'
 
-    optics_sale_payment_line_id= fields.Many2one('optics.sale', 'bill register payment'),
-    date= fields.Datetime("Date"),
-    amount= fields.Float('Amount'),
-    type= fields.Char('Type'),
-    card_no= fields.Char('Card Number'),
-    bank_name= fields.Char('Bank Name'),
-    money_receipt_id= fields.Many2one('leih.money.receipt', 'Money Receipt ID'),
+    optics_sale_payment_line_id= fields.Many2one('optics.sale', 'bill register payment')
+    date= fields.Datetime("Date")
+    amount= fields.Float('Amount')
+    type= fields.Char('Type')
+    card_no= fields.Char('Card Number')
+    bank_name= fields.Char('Bank Name')
+    money_receipt_id= fields.Many2one('leih.money.receipt', 'Money Receipt ID')

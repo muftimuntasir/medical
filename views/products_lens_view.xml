@@ -70,7 +70,7 @@
                 </field>
             </record>
 
-            <menuitem id="menu_diagnosis_department"
+            <menuitem id="menu_products_lens"
                   name="Lens"
                   sequence="11"
                   parent="medical.menu_medical"

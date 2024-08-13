@@ -45,7 +45,7 @@ class patient_info(models.Model):
 
         return result
 
-    @api.multi
+
     @api.constrains('mobile')
     def _check_mobile(self):
 
@@ -60,15 +60,15 @@ class patient_info(models.Model):
 
 
 
-    mobile= fields.char("Mobile No")
-    patient_id= fields.char("Patient Id", readonly=True)
-    name=fields.char("Name", required=True)
-    age=fields.char('Age')
-    address=fields.char('Address',required=True)
-    sex= fields.selection([('male', 'Male'), ('female', 'Female'),('others','Others')], string='Sex', default='male')
-    bills=fields.one2many('bill.register','patient_name','Bill History',required=False)
-    testname=fields.function(_testname,string="Test Name",type='char')
-    state= fields.selection(
+    mobile= fields.Char("Mobile No")
+    patient_id= fields.Char("Patient Id", readonly=True)
+    name=fields.Char("Name", required=True)
+    age=fields.Char('Age')
+    address=fields.Char('Address',required=True)
+    sex= fields.Selection([('male', 'Male'), ('female', 'Female'),('others','Others')], string='Sex', default='male')
+    # bills=fields.One2many('bill.register','patient_name','Bill History',required=False)
+    testname=fields.Char('Char')
+    state= fields.Selection(
         [('created', 'Created'), ('notcreated', 'Notcreated')],
         'Status', default='notcreated', readonly=True)
 

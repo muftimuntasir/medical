@@ -19,22 +19,22 @@
 <!--                        <field name="is_patient"/>-->
                         <field name="state"/>
                     </group>
-                    <notebook attrs ="{'invisible':[('state','!=', 'created')]}">
+<!--                    <notebook attrs ="{'invisible':[('state','!=', 'created')]}">-->
 
-                        <page string="Bill">
-                            <field name="bills">
-                                <tree string="tests history">
+<!--                        <page string="Bill">-->
+<!--                            <field name="bills">-->
+<!--                                <tree string="tests history">-->
 
-                                    <field name="name"/>
-                                    <field name="total"/>
-                                    <field name="paid"/>
-                                    <field name="due"/>
-                                </tree>
-                            </field>
+<!--                                    <field name="name"/>-->
+<!--                                    <field name="total"/>-->
+<!--                                    <field name="paid"/>-->
+<!--                                    <field name="due"/>-->
+<!--                                </tree>-->
+<!--                            </field>-->
 
-                        </page>
+<!--                        </page>-->
 
-                    </notebook>
+<!--                    </notebook>-->
 
                 </sheet>
             </form>
@@ -73,7 +73,11 @@
         </record>
 
 
-        <menuitem name="Patients" id="patients_menu_mainform" parent="leih_profile_menu" action="patients_action" groups="leih.group_profile_menu_patients"/>
-
+       <menuitem id="menu_patients_action"
+                  name="Patient Info"
+                  sequence="13"
+                  parent="medical.menu_medical"
+                  action="patients_action"
+        />
     </data>
 </odoo>

@@ -11,6 +11,11 @@ access_examination_entry_line,examination.entry.line,model_examination_entry_lin
 access_examination_merge_line,examination.merge.line,model_examination_merge_line,base.group_user,1,1,1,1
 access_examine_package,examine.package,model_examine_package,base.group_user,1,1,1,1
 access_blood_bank_donor,blood.donor,model_blood_donor,base.group_user,1,1,1,1
-access_blood_blood_receiver,blood.receiver,model_blood_receiver,base.group_user,1,1,1,1
+access_blood_receiver,blood.receiver,model_blood_receiver,base.group_user,1,1,1,1
 
 access_blood_product_lens,product.lens,model_product_lens,base.group_user,1,1,1,1
+
+access_patient_info,patient.info,model_patient_info,base.group_user,1,1,1,1
+access_optics_sale,optics.sale,model_optics_sale,base.group_user,1,1,1,1
+access_optics_lens_sale_line,optics.lens.sale.line,model_optics_lens_sale_line,base.group_user,1,1,1,1
+access_optics_sale_payment_line,optics.sale.payment.line,model_optics_sale_payment_line,base.group_user,1,1,1,1
