@@ -6,19 +6,19 @@
             <field name="name">advance.cash.view</field>
             <field name="model">advance.cash</field>
             <field name="arch" type="xml">
-            <form string="Advacne Cash">
-                                    <header>
+            <form string="Advance Cash">
+                <header>
 
 <!--                        <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>-->
 
-                        <button string="Confirm" type="object" name="confirm_transfer" groups="base.group_user"/>
-                        <button string="Cancel" type="object" name="inventory_requsition_cancel" groups="base.group_user"/>
+<!--                        <button string="Confirm" type="object" name="confirm_transfer" groups="base.group_user"/>-->
+<!--                        <button string="Cancel" type="object" name="inventory_requsition_cancel" groups="base.group_user"/>-->
                     </header>
                 <sheet>
 
                     <group>
                         <field name="date"/>
-                         <field name="partner_id" domain="[('customer','=',True)]"/>
+                         <field name="partner_id"/>
                         <field name="purpose"/>
                         <field name="amount"/>
                         <field name="credit_accounts"/>
@@ -75,7 +75,10 @@
 
 
 
-        <menuitem name="Advance Cash" id="advance_cash_menu_mainform" parent="leih_billing_menu" action="advance_cash_action" sequence="24" groups="leih.group_hospital_menu_advance_cash"/>
+        <menuitem name="Advance Cash" id="advance_cash_menu_mainform"
+                  parent="medical.menu_medical"
+                  action="advance_cash_action"
+                  sequence="14" />
 
     </data>
 </odoo>

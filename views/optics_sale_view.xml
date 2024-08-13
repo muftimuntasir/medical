@@ -157,7 +157,7 @@
                   parent="medical.menu_medical"
                   action="optics_sale_action"
         />
-            
+
         </data>
 
 </odoo>

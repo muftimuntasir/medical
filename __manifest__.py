@@ -30,6 +30,7 @@
         'views/patients_view.xml',
         'views/products_lens_view.xml',
         'views/optics_sale_view.xml',
+        'views/advance_cash_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

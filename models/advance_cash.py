@@ -5,15 +5,15 @@ class advance_cash(models.Model):
 
 
 
-    date= fields.date('Date')
-    name= fields.char("Cash No.")
-    purpose=fields.char("Purpose",required=True)
-    amount=fields.float("Amount",required=True)
-    journal_id=fields.many2one('account.move', 'Journal ')
-    credit_accounts=fields.many2one("account.account", "Cash/Bank Account")
-    debit_accounts=fields.many2one("account.account", "Advance Account")
-    partner_id=fields.many2one('res.partner','Partner Name',required=True)
-    state= fields.selection(
+    date= fields.Date('Date')
+    name= fields.Char("Cash No.")
+    purpose=fields.Char("Purpose",required=True)
+    amount=fields.Float("Amount",required=True)
+    journal_id=fields.Many2one('account.move', 'Journal ')
+    credit_accounts=fields.Many2one("account.account", "Cash/Bank Account")
+    debit_accounts=fields.Many2one("account.account", "Advance Account")
+    partner_id=fields.Many2one('res.partner','Partner Name',required=True)
+    state= fields.Selection(
         [('pending', 'Pending'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
         'Status', default='pending', readonly=True)
 
@@ -60,7 +60,7 @@ class advance_cash(models.Model):
 
                 j_vals = {'name': '/',
                           'journal_id': 10,  ## Advance Cash Journal
-                          'date': fields.date.today(),
+                          'date': fields.Date.today(),
                           'period_id': period_id,
                           'ref': cc_obj.name,
                           'line_id': line_ids
