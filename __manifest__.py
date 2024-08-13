@@ -25,6 +25,8 @@
         'views/examinationentry_view.xml',
         'views/sample_type_view.xml',
         'views/exmine_package_view.xml',
+        'views/blood_donar.xml',
+        'views/blood_receiver.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

@@ -47,7 +47,11 @@
         </record>
 
         <!-- Menu -->
-        <menuitem name="Blood Bank" id="leih_blood_menu" parent="leih_menu" sequence="6"/>
-        <menuitem name="Blood Donor" id="blood_donor_menu_mainform" parent="leih_blood_menu" action="blood_donor_action" groups="leih.group_blood_bank_menu_donor"/>
+        <menuitem id="menu_opd_ticket_entry"
+                  name="Blood Donar"
+                  sequence="9"
+                  parent="medical.menu_medical"
+                  action="blood_donor_action"
+        />
     </data>
 </odoo>

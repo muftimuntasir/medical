@@ -51,7 +51,11 @@
             <field name="context">{}</field>
         </record>
 
-        <!-- Menuitem -->
-        <menuitem name="Blood Receiver" id="blood_receiver_menu_mainform" parent="leih_blood_menu" action="blood_receiver_action" groups="leih.group_blood_bank_menu_receiver"/>
+        <menuitem id="menu_opd_ticket_entry"
+                  name="Blood Receiver"
+                  sequence="10"
+                  parent="medical.menu_medical"
+                  action="blood_receiver_action"
+        />
     </data>
 </odoo>
