@@ -9,3 +9,4 @@ from . import products_lens
 from . import patient_info
 from . import optics_sale
 from . import advance_cash
+from . import bill_register

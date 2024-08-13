@@ -102,7 +102,7 @@ class BillRegister(models.Model):
 
 
 
-    @api.multi
+
     def advance_paid(self, name):
         bill_obj = self.env['bill.register'].search([('name', '=', name)])
         if bill_obj.state != 'confirmed':
@@ -144,7 +144,7 @@ class BillRegister(models.Model):
         return lists
 
     # if same item exist in line
-    # @api.multi
+    #
     # @api.constrains('bill_register_line_id')
     # def _check_exist_item_in_line(self):
     #     for item in self:
@@ -837,20 +837,22 @@ class TestInformation(models.Model):
         return res
 
 
-        name= fields.Many2one("examination.entry", "Item Name", ondelete='cascade')
-        bill_register_id= fields.Many2one('bill.register', "Information")
-        department= fields.Char("Department")
-        product_qty= fields.Float('Quantity')
-        delivery_date= fields.Date("Delivery Date")
-        date= fields.Datetime("Date", readonly=True, default=lambda self: fields.Datetime.now())
-        price= fields.Integer("Price")
-        discount= fields.Integer("Discount (%)")
-        flat_discount= fields.Integer("Flat Discount")
-        total_discount= fields.Integer("Total Discount")
-        discount_percent= fields.Integer("Discount Percent")
-        total_amount= fields.Integer("Total Amount")
-        assign_doctors= fields.Many2one('doctors.profile', 'Doctor')
-        commission_paid= fields.Boolean("Commission Paid")
+    name= fields.Many2one("examination.entry", "Item Name", ondelete='cascade')
+
+    bill_register_id= fields.Many2one('bill.register', "Information")
+    department= fields.Char("Department")
+    product_qty= fields.Float('Quantity')
+    delivery_date= fields.Date("Delivery Date")
+    date= fields.Datetime("Date", readonly=True, default=lambda self: fields.Datetime.now())
+    price= fields.Integer("Price")
+    discount= fields.Integer("Discount (%)")
+    flat_discount= fields.Integer("Flat Discount")
+    total_discount= fields.Integer("Total Discount")
+    discount_percent= fields.Integer("Discount Percent")
+    total_amount= fields.Integer("Total Amount")
+    assign_doctors= fields.Many2one('doctors.profile', 'Doctor')
+    commission_paid= fields.Boolean("Commission Paid")
+
 
     def onchange_test(self, cr, uid, ids, name, context=None):
         tests = {'values': {}}
@@ -860,7 +862,7 @@ class TestInformation(models.Model):
         # import pdb
         # pdb.set_trace()
         abc = {'department': dep_object.department.name, 'product_qty': 1, 'price': dep_object.rate,
-               'total_amount': dep_object.rate, 'bill_register_id.paid': dep_object.rate,
+               'total_amount': dep_object.rate, 'paid': dep_object.rate,
                'delivery_date': delivery_date}
         tests['value'] = abc
         # import pdb
