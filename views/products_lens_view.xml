@@ -44,7 +44,6 @@
             <record model="ir.actions.act_window" id="lens_action" >
                 <field name="name">Lens Info</field>
                 <field name="res_model">product.lens</field>
-                <field name="view_type">form</field>
                 <field name="view_mode">tree,form,graph</field>
                 <field name="context" eval="{'search_default_my_courses': 1}"/>
                 <field name="help" type="html">
@@ -55,7 +54,6 @@
 
 
 
-            <!--Proforma Invoice record list tree-->
             <record model="ir.ui.view" id="lens_tree_view" >
                 <field name="name">product.lens</field>
                 <field name="model">product.lens</field>
@@ -72,8 +70,12 @@
                 </field>
             </record>
 
-            <menuitem name="Lens" id="lens_menu_mainform" parent="leih_billing_menu" action="lens_action"/>
-
+            <menuitem id="menu_diagnosis_department"
+                  name="Lens"
+                  sequence="11"
+                  parent="medical.menu_medical"
+                  action="lens_action"
+        />
 
         </data>
 

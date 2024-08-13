@@ -12,3 +12,5 @@ access_examination_merge_line,examination.merge.line,model_examination_merge_lin
 access_examine_package,examine.package,model_examine_package,base.group_user,1,1,1,1
 access_blood_bank_donor,blood.donor,model_blood_donor,base.group_user,1,1,1,1
 access_blood_blood_receiver,blood.receiver,model_blood_receiver,base.group_user,1,1,1,1
+
+access_blood_product_lens,product.lens,model_product_lens,base.group_user,1,1,1,1

@@ -5,9 +5,9 @@ class ProductLens(models.Model):
     _name = "product.lens"
 
 
-    lens_code = fields.char("Code")
-    name = fields.char("Name")
-    purchase_price = fields.float("Purchase price")
-    sell_price = fields.float("Sale Price")
-    lens_type = fields.selection([( 'glass','Glass'),('plastic','Plastic')],default='plastic')
-    supplier = fields.char("Supplier Name")
+    lens_code = fields.Char("Code")
+    name = fields.Char("Name")
+    purchase_price = fields.Float("Purchase price")
+    sell_price = fields.Float("Sale Price")
+    lens_type = fields.Selection([( 'glass','Glass'),('plastic','Plastic')],default='plastic')
+    supplier = fields.Char("Supplier Name")

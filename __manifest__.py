@@ -27,6 +27,7 @@
         'views/exmine_package_view.xml',
         'views/blood_donar.xml',
         'views/blood_receiver.xml',
+        'views/products_lens_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

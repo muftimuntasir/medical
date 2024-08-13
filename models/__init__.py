@@ -5,3 +5,4 @@ from . import sample_type
 from . import examinationentry
 from . import examine_package
 from . import blood
+from . import products_lens
