@@ -44,5 +44,12 @@
             </field>
         </record>
 
+        <menuitem id="sampletypeentry_entry"
+                  name="Sample "
+                  sequence="6"
+                  parent="medical.menu_medical"
+                  action="sampletypeentry_action"
+        />
+
     </data>
 </odoo>

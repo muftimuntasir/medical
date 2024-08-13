@@ -20,14 +20,13 @@ class ExaminationEntry(models.Model):
     sample_type = fields.Many2one('sample.type', 'Sample Type')
     accounts_id = fields.Many2one('account.account', "Account ID")
     examination_entry_line_ids = fields.One2many('examination.entry.line', 'examinationentry_id', 'Parameters')
-    merge_ids = fields.Many2many('examination.entry', 'examination_merge_line_rel', 'item_id', 'merge_id',
-                                 string="Merge")
+    merge_ids = fields.Many2many('examination.merge.line', 'examination_merge_line_rel', 'item_id', 'merge_id',string="Merge")
 
-    @api.onchange('manual')
+    # @api.onchange('manual')
     def onchange_manual(self):
         return {'value': {'boolean': self.manual}}
 
-    @api.onchange('group')
+    # @api.onchange('group')
     def onchange_group(self):
         if self.group:
             group = self.env['diagnosis.group'].browse(self.group.id)

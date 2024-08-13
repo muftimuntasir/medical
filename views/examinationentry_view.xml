@@ -2,73 +2,53 @@
 <odoo>
     <data>
 
+        <!-- Form View -->
         <record id="testentry_view" model="ir.ui.view">
-            <field name="name">examination.entry.view</field>
+            <field name="name">examination.entry.form</field>
             <field name="model">examination.entry</field>
             <field name="arch" type="xml">
-            <form string="Test Entry">
-                <sheet>
-
-                    <group>
-
-                        <field name="name"/>
-                        <field name="department"/>
-                        <field name="rate"/>
-                        <field name="base_rate"/>
-                        <field name="required_time"/>
-                        <field name="sample_req"/>
-                        <field name="individual"/>
-                        <field name="manual" on_change="onchange_manual(manual)"/>
-                        <field name="merge"/>
-                        <field name="dependency"/>
-                        <field name="lab_not_required"/>
-                        <field name="indoor"/>
-                        <field name="sample_type"/>
-                        <field name="accounts_id"/>
-
-
-                    </group>
-                <group string="Hehehe" colspan="4" attrs="{'invisible':[('manual', '=', True)]}">
-                    <notebook>
-                        <page string="Referance Value">
-                            <field name="examination_entry_line" mode="tree">
-                                <tree string="Select Referance Value" editable="top">
-
-                                    <field name="name"/>
-                                    <field name="reference_value"/>
-                                    <field name="bold"/>
-                                    <field name="group_by"/>
-                                    <field name="others"/>
-
-
-                                </tree>
-                            </field>
-                        </page>
-
-
-                        <page string="Merge Value">
-                            <field name="merge_ids" mode="tree">
-                                <tree string="Select Referance Value" editable="top">
-
-                                    <field name="merge_id"/>
-<!--                                    <field name="name"/>-->
-                                </tree>
-                            </field>
-                        </page>
-
-                    </notebook>
-                     </group>
-
-                </sheet>
-            </form>
-
+                <form string="Test Entry">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="department"/>
+                            <field name="rate"/>
+                            <field name="base_rate"/>
+                            <field name="required_time"/>
+                            <field name="sample_req"/>
+                            <field name="individual"/>
+                            <field name="manual" on_change="onchange_manual(manual)"/>
+                            <field name="merge"/>
+                            <field name="dependency"/>
+                            <field name="lab_not_required"/>
+                            <field name="indoor"/>
+                            <field name="sample_type"/>
+                            <field name="accounts_id"/>
+                        </group>
+                        <group string="Configuration" colspan="4">
+                            <notebook>
+                                <page string="Reference Value">
+                                    <field name="examination_entry_line_ids" mode="tree">
+                                        <tree string="Select Reference Value" editable="top">
+                                            <field name="name"/>
+                                            <field name="reference_value"/>
+                                            <field name="bold"/>
+                                            <field name="group_by"/>
+                                            <field name="others"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Merge Value">
+                                    <field name="merge_ids" mode="tree"/>
+                                </page>
+                            </notebook>
+                        </group>
+                    </sheet>
+                </form>
             </field>
-
         </record>
 
-
-
-
+        <!-- Action -->
         <record id="examinationentry_action" model="ir.actions.act_window">
             <field name="name">Examination Entry</field>
             <field name="res_model">examination.entry</field>
@@ -77,26 +57,25 @@
             <field name="context">{}</field>
         </record>
 
-        <!-- expense type tree -->
-        <record model="ir.ui.view" id="testentry_tree">
-            <field name="name">leih</field>
+        <!-- Tree View -->
+        <record id="testentry_tree" model="ir.ui.view">
+            <field name="name">examination.entry.tree</field>
             <field name="model">examination.entry</field>
             <field name="arch" type="xml">
-            <tree string="Alu List">
-                        <field name="name"/>
-<!--                        <field name="group"/>-->
-                        <field name="department"/>
-                        <field name="rate"/>
-                        <field name="required_time"/>
-            </tree>
+                <tree string="Alu List">
+                    <field name="name"/>
+                    <field name="department"/>
+                    <field name="rate"/>
+                    <field name="required_time"/>
+                </tree>
             </field>
         </record>
 
-
-
-
-        <menuitem name="Item Entry" id="testentry_menu_mainform" parent="leih_config_menu" action="examinationentry_action" groups="leih.group_configuration_menu_item_entry"/>
-
-
+        <menuitem id="menu_item_entry"
+                  name="Item Entry"
+                  sequence="5"
+                  parent="medical.menu_medical"
+                  action="examinationentry_action"
+        />
     </data>
 </odoo>

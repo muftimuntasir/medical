@@ -13,7 +13,7 @@
     # 'maintainer': 'Odoo Mates',
     # 'support': 'odoomates@gmail.com',
     # 'website': 'https://www.youtube.com/watch?v=yA4NLwOLZms',
-    'depends': ['base'],
+    'depends': ['base','om_account_accountant'],
     # 'live_test_url': 'https://www.youtube.com/watch?v=yA4NLwOLZms',
     'data': [
         'security/ir.model.access.csv',
@@ -21,6 +21,9 @@
         'views/opd_ticket_view.xml',
         'views/opd_ticket_entry_view.xml',
         'views/department_view.xml',
+        'views/diagonosisgroup_view.xml',
+        'views/examinationentry_view.xml',
+        'views/sample_type_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

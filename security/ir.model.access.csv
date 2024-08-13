@@ -4,3 +4,8 @@ access_opd_ticket_entry,opd.ticket.entry,model_opd_ticket_entry,base.group_user,
 access_opd_ticket_line,opd.ticket.line,model_opd_ticket_line,base.group_user,1,1,1,1
 
 access_diagnosis_department,diagnosis.department,model_diagnosis_department,base.group_user,1,1,1,1
+access_sample_type,sample.type,model_sample_type,base.group_user,1,1,1,1
+access_diagnosis_group,diagnosis.group,model_diagnosis_group,base.group_user,1,1,1,1
+access_examination_entry,examination.entry,model_examination_entry,base.group_user,1,1,1,1
+access_examination_entry_line,examination.entry.line,model_examination_entry_line,base.group_user,1,1,1,1
+access_examination_merge_line,examination.merge.line,model_examination_merge_line,base.group_user,1,1,1,1
