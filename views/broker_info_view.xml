@@ -19,11 +19,8 @@
                     </group>
                     <notebook>
                         <page string="Bill Register">
-                            <field name="bill_info">
-                                <group>
-                                    <field name="total"/>
-                                </group>
-                            </field>
+                            <field name="bill_info"/>
+
                         </page>
                         <page string="Admission Info">
 
@@ -60,7 +57,10 @@
             </field>
         </record>
 
-        <menuitem name="Brokers" id="broker_menu_mainform" parent="leih_profile_menu" action="broker_action"/>
+              <menuitem name="Broker" id="menu_broker_action"
+                  parent="medical.menu_medical"
+                  action="broker_action"
+                  sequence="16" />
 
     </data>
 </odoo>

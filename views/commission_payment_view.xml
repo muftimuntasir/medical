@@ -15,9 +15,6 @@
                     </header>
 
                     <sheet>
-                        <h1>
-                            <label string="Commission Payment"/>
-                        </h1>
                         <group string="Basic Information">
                             <group>
                                 <field name="id" invisible="1"/>
@@ -94,20 +91,9 @@
             </field>
         </record>
 
-        <menuitem id="main_commissionpaymentlist_menu" name="Commission Payment"/>
-
+               <menuitem id="main_commissionpaymentlist_menu" name="Commission Payment" parent="medical.menu_medical" sequence="21" />
         <menuitem id="commissionpaymentlist_menu" name="Commission Payment" parent="main_commissionpaymentlist_menu"/>
         <menuitem id="courses_menu3" name="Commission Payment" parent="main_commissionpaymentlist_menu" action="commission_payment_new_action"/>
-
-
-        <menuitem name="Commission Payment list" id="main_commissionpaymentlist_menu"
-            groups="base.group_sale_salesman"
-            parent="base.menu_base_partner" sequence="10" />
-
-
-
-
-
 
 
 

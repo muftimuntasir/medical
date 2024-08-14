@@ -13,8 +13,8 @@ class doctors_profile(models.Model):
     status= fields.Selection([('active', 'Active'), ('inactive', 'Inactive')], string='Status', default='active')
     others= fields.Char("Others")
     bill_info=fields.One2many("bill.register",'ref_doctors',"Bill Register")
-    admission_info=fields.Many2one("leih.admission",'ref_doctors',"Admission Info")
-    commission=fields.Many2one("commission",'ref_doctors',"Commission")
+    # admission_info=fields.Many2one("leih.admission",'ref_doctors',"Admission Info")
+    commission=fields.Many2one("commission","Commission")
     ipd_visit=fields.Float("IPD Visit Fee")
 
     commission_rate=fields.Float("Commission Rate (%) ")

@@ -20,9 +20,6 @@
                     </header>
 
                     <sheet>
-                        <h1>
-                            <label string="Commission Calculation"/>
-                        </h1>
                         <group string="Basic Information">
                             <group>
                                 <field name="cal_st_date"/>
@@ -45,21 +42,7 @@
                         <notebook>
 
                             <page string="Commission Products">
-                                <field name="commission_line_ids" mode="tree">
-                                    <tree string="Commission Products" editable="top">
-                                        <field name="department_id"/>
-                                        <field name="bill_line_id"/>
-                                        <field name="name"/>
-                                        <field name="discount_amount"/>
-                                        <field name="test_amount"/>
-                                        <field name="mou_payable_comm_var"/>
-                                        <field name="mou_payable_comm_fixed"/>
-                                        <field name="mou_payable_comm_max_cap"/>
-                                        <field name="after_discount"/>
-                                        <field name="payable_amount"/>
-
-                                    </tree>
-                                </field>
+                                <field name="commission_line_ids" mode="tree" />
                             </page>
 
 
@@ -70,15 +53,6 @@
             </field>
         </record>
 
-        <record model="ir.ui.view" id="commission_graph_view">
-                <field name="name">Commission Graph</field>
-                <field name="model">commission</field>
-                <field name="arch" type="xml">
-                    <graph string="">
-                        <field name="ref_doctors"/>
-                    </graph>
-                </field>
-        </record>
 
 
         <!--commission starting action-->
@@ -117,16 +91,10 @@
                 </tree>
             </field>
         </record>
-
-        <menuitem id="main_commissionlist_menu" name="Commission List"/>
+        <menuitem name="Commission" id="main_commissionlist_menu" parent="medical.menu_medical" sequence="18" />
 
         <menuitem id="commissionlist_menu" name="Commission List" parent="main_commissionlist_menu"/>
         <menuitem id="courses_menu" name="Commission List" parent="main_commissionlist_menu" action="commission_new_action"/>
-
-
-        <menuitem name="Commission list" id="main_commissionlist_menu"
-            groups="base.group_sale_salesman"
-            parent="base.menu_base_partner" sequence="4" />
 
 
 

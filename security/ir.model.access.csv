@@ -26,3 +26,12 @@ access_bill_register,bill.register,model_bill_register,base.group_user,1,1,1,1
 access_bill_register_line,bill.register.line,model_bill_register_line,base.group_user,1,1,1,1
 access_bill_register_payment_line,bill.register.payment.line,model_bill_register_payment_line,base.group_user,1,1,1,1
 access_bill_journal_relation,bill.journal.relation,model_bill_journal_relation,base.group_user,1,1,1,1
+
+access_broker_info,broker.info,model_brokers_info,base.group_user,1,1,1,1
+access_doctors_profile,doctors.profile,model_doctors_profile,base.group_user,1,1,1,1
+
+
+access_commission,commission,model_commission,base.group_user,1,1,1,1
+access_commission_configuration,commission.configuration,model_commission_configuration,base.group_user,1,1,1,1
+access_commission_calculation,commission.calculation,model_commission_calculation,base.group_user,1,1,1,1
+access_commission_payment,commission.payment,model_commission_payment,base.group_user,1,1,1,1

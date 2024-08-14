@@ -20,7 +20,7 @@ class OPDTicket(models.Model):
     date = fields.Date("Date", readonly=True, default=lambda self: fields.Datetime.now())
     ref_doctors = fields.Many2one('doctors.profile', 'Reffered by')
     opd_ticket_line_id = fields.One2many('opd.ticket.line', 'opd_ticket_id', 'Investigations', required=True)
-    user_id = fields.Many2one('res.users', 'Assigned to', select=True, track_visibility='onchange')
+    user_id = fields.Many2one('res.users', 'Assigned to', select=True,)
     state = fields.Selection(
         [('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
         'Status', default='confirmed')
@@ -67,21 +67,21 @@ class OPDTicket(models.Model):
         cr.commit()
         return "C"
 
-    def onchange_total(self, cr, uid, ids, name, context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('leih.tests').browse(cr, uid, name, context=None)
-        abc = {'total': dep_object.rate}
-        tests['value'] = abc
-        # import pdb
-        # pdb.set_trace()
-        return tests
-
-    def onchange_patient(self, cr, uid, ids, name, context=None):
-        tests = {}
-        dep_object = self.pool.get('patient.info').browse(cr, uid, name, context=None)
-        abc = {'mobile': dep_object.mobile, 'address': dep_object.address, 'age': dep_object.age, 'sex': dep_object.sex}
-        tests['value'] = abc
-        return tests
+    # def onchange_total(self, cr, uid, ids, name, context=None):
+    #     tests = {'values': {}}
+    #     dep_object = self.pool.get('leih.tests').browse(cr, uid, name, context=None)
+    #     abc = {'total': dep_object.rate}
+    #     tests['value'] = abc
+    #     # import pdb
+    #     # pdb.set_trace()
+    #     return tests
+    #
+    # def onchange_patient(self, cr, uid, ids, name, context=None):
+    #     tests = {}
+    #     dep_object = self.pool.get('patient.info').browse(cr, uid, name, context=None)
+    #     abc = {'mobile': dep_object.mobile, 'address': dep_object.address, 'age': dep_object.age, 'sex': dep_object.sex}
+    #     tests['value'] = abc
+    #     return tests
 
     def create(self, cr, uid, vals, context=None):
         if context is None:
@@ -305,14 +305,14 @@ class test_information(models.Model):
     department =fields.Char('Department')
     total_amount = fields.Integer("Total Amount")
 
-    def onchange_item(self, cr, uid, ids, name, context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('opd.ticket.entry').browse(cr, uid, name, context=None)
-        abc = {'price': dep_object.fee, 'department': dep_object.department.name, 'total_amount': dep_object.fee}
-        tests['value'] = abc
-        # import pdb
-        # pdb.set_trace()
-        return tests
+    # def onchange_item(self, cr, uid, ids, name, context=None):
+    #     tests = {'values': {}}
+    #     dep_object = self.pool.get('opd.ticket.entry').browse(cr, uid, name, context=None)
+    #     abc = {'price': dep_object.fee, 'department': dep_object.department.name, 'total_amount': dep_object.fee}
+    #     tests['value'] = abc
+    #     # import pdb
+    #     # pdb.set_trace()
+    #     return tests
 
 
 

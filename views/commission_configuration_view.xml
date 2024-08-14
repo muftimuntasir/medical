@@ -15,9 +15,6 @@
                     </header>
 
                     <sheet>
-                        <h1>
-                            <label string="Commission Configuration"/>
-                        </h1>
                         <group string="Basic Information">
                             <group>
                                 <field name="id" invisible="1"/>
@@ -97,15 +94,12 @@
             </field>
         </record>
 
-        <menuitem id="main_commissionconfigurationlist_menu" name="Commission Configuration"/>
+        <menuitem id="main_commissionconfigurationlist_menu" name="Commission Configuration" parent="medical.menu_medical" sequence="20" />
 
         <menuitem id="commissionconfigurationlist_menu" name="Commission Configuration" parent="main_commissionconfigurationlist_menu"/>
         <menuitem id="courses_menu2" name="Commission Configuration" parent="main_commissionconfigurationlist_menu" action="commission_configuration_new_action"/>
 
 
-        <menuitem name="Commission Configuration list" id="main_commissionconfigurationlist_menu"
-            groups="base.group_sale_salesman"
-            parent="base.menu_base_partner" sequence="5" />
 
 
 

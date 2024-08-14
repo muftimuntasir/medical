@@ -8,11 +8,11 @@ class brokers_info(models.Model):
 
     broker_id= fields.Char(string="Broker ID", readonly=True)
     broker_name= fields.Char("Broker Name", required=True)
-    status= fields.Selection([('active', 'Active') ('inactive', 'Inactive')], string='Status', default='active')
+    status= fields.Selection([('active', 'Active'),('inactive', 'Inactive')], string='Status', default='active')
     commission_rate= fields.Float("Commission Rate (%) ")
     last_commission_calculation_date= fields.Date("Last Commission Calculation Date")
     bill_info= fields.One2many("bill.register", 'referral', "Bill Register")
-    doctor_ids= fields.Many2many('doctors.profile', 'referral_relation', 'broker_id', 'doctor_id', "Broker Name")
+    # doctor_ids= fields.Many2many('doctors.profile', 'referral_relation', 'broker_id', 'doctor_id', "Broker Name")
 
 
     def create(self, cr, uid, vals, context=None):

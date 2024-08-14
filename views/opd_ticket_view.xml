@@ -18,8 +18,7 @@
                             <!--                        <field name="name"/>-->
                             <field name="date"/>
                             <field name="patient_id"/>
-                            <field name="patient_name" on_change="onchange_patient(patient_name, context)"
-                                   options="{'no_create_edit' : True}"/>
+                            <field name="patient_name"/>
                             <field name="address"/>
                             <field name="age"/>
                             <field name="sex"/>
@@ -33,7 +32,7 @@
                                 <field name="opd_ticket_line_id" mode="tree">
                                     <tree string="Select Referance Value" editable="top">
 
-                                        <field name="name" on_change="onchange_item(name, context)"/>
+                                        <field name="name"/>
                                         <field name="department"/>
                                         <field name="price"/>
                                         <field name="total_amount"/>

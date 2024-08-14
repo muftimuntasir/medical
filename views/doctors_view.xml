@@ -28,34 +28,22 @@
                     </group>
                     <notebook>
                         <page string="Bill Register">
-                            <field name="bill_info">
-                                <group>
-                                <field name="total"/>
-                                </group>
-
-                            </field>
+                            <field name="bill_info"/>
                         </page>
-                        <page string="Admission Info">
-                            <field name="admission_info">
-                             <field name="name"/>
-                            <field name="patient_name"/>
-                            <field name="mobile"/>
+<!--                        <page string="Admission Info">-->
+<!--                            <field name="admission_info">-->
+<!--                             <field name="name"/>-->
+<!--                            <field name="patient_name"/>-->
+<!--                            <field name="mobile"/>-->
 
-                            </field>
-
-
+<!--                            </field>-->
 
 
-                        </page>
+
+
+<!--                        </page>-->
                         <page string="Commission">
-                             <field name="commission">
-                                 <field name="name"/>
-
-                                <field name="commission_configuration_id"/>
-
-                                <field name="total_amount"/>
-                             </field>
-
+                             <field name="commission"/>
 
                         </page>
                     </notebook>
@@ -97,8 +85,11 @@
 
 
 <!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
-        <menuitem name="Profile" id="leih_profile_menu" parent="leih_menu" sequence="5"/>
-        <menuitem name="Doctors" id="doctors_menu_mainform" parent="leih_profile_menu" action="doctors_action" groups="leih.group_profile_menu_doctors"/>
+        <menuitem name="Profile" id="leih_profile_menu" parent="medical.menu_medical" sequence="17"/>
+      <menuitem name="Doctors Profile" id="advance_investigation_action"
+                  parent="medical.leih_profile_menu"
+                  action="doctors_action"
+                  sequence="15" />
 
 
     </data>
