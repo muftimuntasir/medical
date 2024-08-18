@@ -105,7 +105,7 @@
             </field>
         </record>
 
-      <menuitem name="Investigation" id="advance_investigation_action"
+      <menuitem name="Investigation" id="advance_investigation_menu_action"
                   parent="medical.menu_medical"
                   action="investigation_action"
                   sequence="15" />

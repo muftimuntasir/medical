@@ -38,6 +38,7 @@
         'views/commission_calculation_view.xml',
         'views/commission_configuration_view.xml',
         'views/commission_payment_view.xml',
+        'views/sticker_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

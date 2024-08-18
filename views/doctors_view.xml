@@ -89,7 +89,7 @@
       <menuitem name="Doctors Profile" id="advance_investigation_action"
                   parent="medical.leih_profile_menu"
                   action="doctors_action"
-                  sequence="15" />
+                  sequence="26" />
 
 
     </data>

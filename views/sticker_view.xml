@@ -1,72 +1,38 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-    <record id="minutes_meeting_search_view" model="ir.ui.view">
-                <field name="name">lab search view</field>
-                <field name="model">diagnosis.sticker</field>
-                <field eval="10" name="priority"/>
-                <field name="arch" type="xml">
-                    <search string="MoM">
-                        <filter icon="terp-mail-message-new" string="Action Items" name="my_requests_filter" domain="[('state','!=','lab')]"/>
-                        <field name="state"/>
-                        <field name="name"/>
-                            <filter name="fil_by_disability" string="lab fileter" domain="[('state','=','lab')]"
-                            help="Show all Physically Disabled Students" />
-                    </search>
-                </field>
-            </record>
 
-    <record model="ir.ui.view" id="sticker_graph_view">
-                    <field name="name">LAB Graph</field>
-                    <field name="model">diagnosis.sticker</field>
-                    <field name="arch" type="xml">
-                        <graph string="">
-                            <field name="department_id"/>
+        <record id="sample_action" model="ir.actions.act_window">
+            <field name="name">Sticker</field>
+            <field name="res_model">diagnosis.sticker</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree</field>
+            
+        </record>
 
-                        </graph>
-                    </field>
-            </record>
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="sample_tree" >
+            <field name="name">leih</field>
+            <field name="model">diagnosis.sticker</field>
+            <field name="arch" type="xml">
 
+            <tree string="Alu List">
+            <field name="name"/>
+            <field name="full_name"/>
+            <field name="bill_register_id"/>
+            <field name="department_id"/>
+            <field name="state">[('state','=','lab')]</field>
 
-            <record id="sample_action" model="ir.actions.act_window">
-                <field name="name">Sticker</field>
-                <field name="res_model">diagnosis.sticker</field>
-                <field name="type">ir.actions.act_window</field>
-                <field name="view_type">form</field>
-                <field name="view_mode">tree,form,graph</field>
-                <field name="domain">[('state','=','sample')]</field>
-                <field name="context">{}</field>
-            </record>
-
-            <!-- expense type tree -->
-            <record model="ir.ui.view" id="sample_tree" >
-                <field name="name">leih</field>
-                <field name="model">diagnosis.sticker</field>
-                <field name="arch" type="xml">
-
-                <tree string="Alu List">
-                            <field name="name"/>
-                        <field name="full_name"/>
-                            <field name="bill_register_id"/>
-                            <field name="department_id"/>
-                            <field name="state">[('state','=','lab')]</field>
+            </tree>
+            </field>
+        </record>
 
 
 
 
+        <menuitem name="Lab Section" id="main_lab_section_menu" parent="medical.menu_medical" sequence="31" />
+        <menuitem id="sample_collection_menu" name="Sample Collection" parent="main_lab_section_menu"/>
+        <menuitem id="commission_calculation_action_menu" name="Sample Collection List" parent="main_lab_section_menu" action="sample_action"/>
 
-                </tree>
-                </field>
-            </record>
-
-
-
-
-    <!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
-            <menuitem name="Lab" id="leih_labs_menu" parent="leih_menu" sequence="3"/>
-            <menuitem name="Sample Collection" id="sample_menu_mainform" parent="leih_labs_menu" action="sample_action" groups="leih.group_lab_menu_sample_collection"/>
-
-
-        </data>
+    </data>
 </odoo>
