@@ -11,21 +11,24 @@
         </record>
 
         <!-- expense type tree -->
-        <record model="ir.ui.view" id="sample_tree" >
+        <record model="ir.ui.view" id="sample_form" >
             <field name="name">leih</field>
             <field name="model">diagnosis.sticker</field>
             <field name="arch" type="xml">
-
-            <tree string="Alu List">
+                <form string="Sample">
+                <sheet>
+                    <group>
             <field name="name"/>
             <field name="full_name"/>
             <field name="bill_register_id"/>
             <field name="department_id"/>
             <field name="state">[('state','=','lab')]</field>
-
-            </tree>
+                </group>
+                </sheet>
+                </form>
             </field>
         </record>
+
 
 
 

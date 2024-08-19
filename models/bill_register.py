@@ -98,7 +98,6 @@ class BillRegister(models.Model):
             else:
                 self.to_be_paid = self.paid
                 self.service_charge = 0
-        return "X"
 
 
 
@@ -399,46 +398,41 @@ class BillRegister(models.Model):
         else:
             raise UserError('PLease Pay minimum amount.')
 
-    def onchange_total(self, cr, uid, ids, name, context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('leih.tests').browse(cr, uid, name, context=None)
-        abc = {'total': dep_object.rate}
-        tests['value'] = abc
-        return tests
 
-    def onchange_patient(self, cr, uid, ids, name, context=None):
-        tests = {}
-        dep_object = self.pool.get('patient.info').browse(cr, uid, name, context=None)
-        abc = {'mobile': dep_object.mobile, 'address': dep_object.address, 'age': dep_object.age, 'sex': dep_object.sex}
-        tests['value'] = abc
-        return tests
+    @api.onchange('patient_name')
+    def onchange_patient(self):
+        dep_object = self.patient_name
+        self.mobile=dep_object.mobile
+        self.address= dep_object.address
+        self.age= dep_object.age
+        self.sex= dep_object.sex
 
-    def add_new_test(self, cr, uid, ids, context=None):
-        if not ids: return []
-
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'add_bill_view')
-        #
-        inv = self.browse(cr, uid, ids[0], context=context)
-        # import pdb
-        # pdb.set_trace()
-        return {
-            'name': _("Pay Invoice"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'add.bill',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': {
-                'bill_id': ids[0],
-                'default_price': 500,
-                # 'default_name':context.get('name', False),
-                'default_total_amount': 200,
-            }
-        }
-        raise UserError(_('Error!'), _('There is no default company for the current user!'))
+    # def add_new_test(self, cr, uid, ids, context=None):
+    #     if not ids: return []
+    #
+    #     dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'add_bill_view')
+    #     #
+    #     inv = self.browse(cr, uid, ids[0], context=context)
+    #     # import pdb
+    #     # pdb.set_trace()
+    #     return {
+    #         'name': _("Pay Invoice"),
+    #         'view_mode': 'form',
+    #         'view_id': view_id,
+    #         'view_type': 'form',
+    #         'res_model': 'add.bill',
+    #         'type': 'ir.actions.act_window',
+    #         'nodestroy': True,
+    #         'target': 'new',
+    #         'domain': '[]',
+    #         'context': {
+    #             'bill_id': ids[0],
+    #             'default_price': 500,
+    #             # 'default_name':context.get('name', False),
+    #             'default_total_amount': 200,
+    #         }
+    #     }
+    #     raise UserError(_('Error!'), _('There is no default company for the current user!'))
 
     def button_dummy(self, cr, uid, ids, context=None):
 
@@ -549,210 +543,154 @@ class BillRegister(models.Model):
         }
         raise UserError(_('Error!'), _('There is no default company for the current user!'))
 
-    def create(self, cr, uid, vals, context=None):
+    @api.model
+    def create(self, vals):
+        # Check if 'due' is present and validate it
         if vals.get("due"):
             if vals.get("due") < 0:
-                raise UserError(_('Warning!'),
-                                     _("Check paid and grand total!"))
+                raise UserError(_('Warning! Check paid and grand total!'))
 
-        if context is None:
-            context = {}
-
+        # List of diagnostic departments
         child_ids = ["MRI", 'X-Ray', 'Radiology & Imaging', 'Pathology', 'Bio-Chemistry', 'Haematology', 'Serology',
                      'Micro-Biology', 'CT Scan', 'USG', 'Diagnostic', 'X-Ray', 'Echocardiogram', 'Hormone',
                      'Immunology']
 
-        ### Check Diagonostice Items available or not. If avvailable then no ther component will be there
-
+        # Get departments from bill register lines
         get_all_depts = []
         if vals.get('bill_register_line_id'):
             for items in vals.get('bill_register_line_id'):
-                if items[2].get('department'):
-                    if items[2].get('department') not in get_all_depts:
-                        get_all_depts.append(items[2].get('department'))
+                if isinstance(items, (list, tuple)) and len(items) == 3 and items[2].get('department'):
+                    department = items[2].get('department')
+                    if department not in get_all_depts:
+                        get_all_depts.append(department)
 
-        ## Check Diagnsis exists
+        # Check if there are mixed departments
         mixed_up = False
         vals['diagonostic_bill'] = False
 
         intersection_result = list(set(child_ids) & set(get_all_depts))
-        if len(intersection_result) > 0 and len(intersection_result) == len(get_all_depts):
-            mixed_up = False
+        if intersection_result and len(intersection_result) == len(get_all_depts):
             vals['diagonostic_bill'] = True
-        elif len(intersection_result) > 0 and len(intersection_result) != len(get_all_depts):
+        elif intersection_result and len(intersection_result) != len(get_all_depts):
             mixed_up = True
 
-        if mixed_up == True:
-            raise UserError(_('Attention'),
-                                 _('This investigation has diagnosis and others department mix up'))
+        if mixed_up:
+            raise UserError(_('Attention'), _('This investigation has diagnosis and other departments mixed up'))
 
-        ### Ends Here Diagonostic Items
-        #
-        #
-        # import pdb
-        # pdb.set_trace()
+        # Create the bill register record
+        record = super(BillRegister, self).create(vals)
 
-        stored = super(BillRegister, self).create(cr, uid, vals, context)  # return ID int object
+        # Update the name field after creation
+        if record:
+            name_text = 'Bill-0' + str(record.id)
+            self.env.cr.execute('UPDATE bill_register SET name=%s WHERE id=%s', (name_text, record.id))
 
-        if stored is not None:
-            name_text = 'Bill-0' + str(stored)
-            cr.execute('update bill_register set name=%s where id=%s', (name_text, stored))
-            cr.commit()
-        return stored
+        return record
 
-    def write(self, cr, uid, ids, vals, context=None):
-        if vals.get("due"):
-            if vals.get("due") < 0:
-                raise UserError(_('Warning!'),
-                                     _("Check paid and grand total!"))
+    def write(self, vals):
+        # Check if 'due' is present and validate it
+        if vals.get("due") and vals.get("due") < 0:
+            raise UserError(_('Warning! Check paid and grand total!'))
 
         updated = False
-        if vals.get('bill_register_line_id') or uid == 1:
-            cr.execute(
-                "select id as journal_ids from account_move where ref = (select name from bill_register where id=%s limit 1)",
-                (ids))
-            journal_ids = cr.fetchall()
-            context = context
-            updated = super(BillRegister, self).write(cr, uid, ids, vals, context=context)
 
-            itm = [itm[0] for itm in journal_ids]
+        # Check if 'bill_register_line_id' is present or if the user is an admin
+        if vals.get('bill_register_line_id') or self.env.uid == 1:
+            # Fetch journal entries linked to this bill register
+            self.env.cr.execute("""
+                SELECT id AS journal_ids 
+                FROM account_move 
+                WHERE ref = (SELECT name FROM bill_register WHERE id=%s LIMIT 1)
+            """, (self.id,))
+            journal_ids = [row[0] for row in self.env.cr.fetchall()]
 
-            if len(itm) > 0:
+            updated = super(BillRegister, self).write(vals)
 
-                uid = 1
-                moves = self.pool.get('account.move').browse(cr, uid, itm, context=context)
-                xx = moves.button_cancel()
-                bill_journal_id = []
-                user_q = "select id from bill_journal_relation where journal_id in %s"
-                cr.execute(user_q, (tuple(itm),))
-                journal_id = cr.fetchall()
-                for item in journal_id:
-                    bill_journal_id.append(item[0])
+            if journal_ids:
+                # Cancel linked journal entries and delete related records
+                moves = self.env['account.move'].browse(journal_ids)
+                moves.button_cancel()
 
-                query = "delete from bill_journal_relation where id in %s"
-                cr.execute(query, (tuple(bill_journal_id),))
+                # Delete entries from bill_journal_relation
+                self.env.cr.execute("""
+                    DELETE FROM bill_journal_relation 
+                    WHERE journal_id IN %s
+                """, (tuple(journal_ids),))
 
+                # Delete the journal entries
                 moves.unlink()
 
-                stored_obj = self.browse(cr, uid, [ids[0]], context=context)
-                journal_object = self.pool.get("bill.journal.relation")
+                # Recreate the journal entries
+                stored_obj = self.browse(self.id)
                 if stored_obj:
                     line_ids = []
+                    period_id = self.env['account.period'].find().id
 
-                    if context is None: context = {}
-                    if context.get('period_id', False):
-                        return context.get('period_id')
-                    periods = self.pool.get('account.period').find(cr, uid, context=context)
-                    period_id = periods and periods[0] or False
-                    has_been_paid = stored_obj.paid
-                    ar_amount = stored_obj.due
-
-                    if ar_amount > 0:
+                    if stored_obj.due > 0:
                         line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
                             'name': stored_obj.name,
-                            'currency_id': False,
-                            'credit': 0,
-                            'date_maturity': False,
-                            'account_id': 195,  ### Accounts Receivable ID
-                            'debit': ar_amount,
-                            'amount_currency': 0,
-                            'partner_id': False,
+                            'account_id': 195,  # Accounts Receivable ID
+                            'debit': stored_obj.due,
                         }))
 
-                    if has_been_paid > 0:
+                    if stored_obj.paid > 0:
                         line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
                             'name': stored_obj.name,
-                            'currency_id': False,
-                            'credit': 0,
-                            'date_maturity': False,
-                            'account_id': 6,  ### Cash ID
-                            'debit': has_been_paid,
-                            'amount_currency': 0,
-                            'partner_id': False,
+                            'account_id': 6,  # Cash ID
+                            'debit': stored_obj.paid,
                         }))
 
                     for cc_obj in stored_obj.bill_register_line_id:
-                        ledger_id = 611
-                        try:
-                            ledger_id = cc_obj.name.accounts_id.id
-                        except:
-                            ledger_id = 611  ## Diagnostic Income Head , If we don't assign any Ledger
-
-                        if context is None:
-                            context = {}
-
+                        account_id = cc_obj.name.accounts_id.id if cc_obj.name.accounts_id else 611
                         line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
                             'name': cc_obj.name.name,
-                            'currency_id': False,
-                            'account_id': cc_obj.name.accounts_id.id,
+                            'account_id': account_id,
                             'credit': cc_obj.total_amount,
-                            'date_maturity': False,
-                            'debit': 0,
-                            'amount_currency': 0,
-                            'partner_id': False,
                         }))
 
-                    jv_entry = self.pool.get('account.move')
+                    journal_entry = self.env['account.move'].create({
+                        'journal_id': 2,  # Sales Journal
+                        'date': stored_obj.date,
+                        'ref': stored_obj.name,
+                        'line_ids': line_ids
+                    })
+                    journal_entry.action_post()
 
-                    j_vals = {'name': '/',
-                              'journal_id': 2,  ## Sales Journal
-                              'date': stored_obj.date,
-                              'period_id': period_id,
-                              'ref': stored_obj.name,
-                              'line_id': line_ids
+                    # Update bill register state and link the journal entry
+                    stored_obj.write({'state': 'confirmed'})
+                    self.env['bill.journal.relation'].create({
+                        'journal_id': journal_entry.id,
+                        'bill_journal_relation_id': stored_obj.id,
+                    })
 
-                              }
+        if not updated:
+            updated = super(BillRegister, self).write(vals)
 
-                    saved_jv_id = jv_entry.create(cr, uid, j_vals, context=context)
-                    if saved_jv_id > 0:
-                        journal_id = saved_jv_id
-                        try:
-                            jv_entry.button_validate(cr, uid, [saved_jv_id], context)
-                            cr.execute("update bill_register set state='confirmed' where id=%s", (ids))
-                            cr.commit()
-                            journal_dict = {'journal_id': journal_id, 'bill_journal_relation_id': stored_obj.id}
-                            journal_object.create(cr, uid, vals=journal_dict, context=context)
-                        except:
-                            import pdb
-                            pdb.set_trace()
-                    return updated
-                    ### Ends the journal Entry Here
-            else:
-                if updated is not True:
-                    updated = super(BillRegister, self).write(cr, uid, ids, vals, context=context)
-                # raise UserError(_('Warning!'),
-                #                      _("You cannot Edit the bill"))
-                return updated
+        return updated
 
     @api.onchange('bill_register_line_id')
     def onchange_test_bill(self):
         sumalltest = 0
         total_without_discount = 0
-        for item in self.bill_register_line_id:
-            sumalltest = sumalltest + item.total_amount
-            total_without_discount = total_without_discount + item.price
 
+        # Loop through the related line items to calculate sums
+        for item in self.bill_register_line_id:
+            sumalltest += item.total_amount
+            total_without_discount += item.price
+
+        # Update the fields with calculated values
         self.total = sumalltest
-        after_dis = (sumalltest * (self.doctors_discounts / 100))
-        self.after_discount = 0
+
+        if self.doctors_discounts:
+            after_dis = sumalltest * (self.doctors_discounts / 100)
+        else:
+            after_dis = 0
+
+        self.after_discount = after_dis
 
         self.grand_total = sumalltest
         self.due = sumalltest - self.paid
         self.total_without_discount = total_without_discount
-        # import pdb
-        # pdb.set_trace()
-        #
-
-        return "X"
 
     @api.onchange('paid')
     def onchange_paid(self):
@@ -763,7 +701,6 @@ class BillRegister(models.Model):
                 service_charge = (self.paid * interest) / 100
                 self.service_charge = service_charge
                 self.to_be_paid = self.paid + service_charge
-        return 'x'
 
     @api.onchange('doctors_discounts')
     def onchange_doc_discount(self):
@@ -774,21 +711,6 @@ class BillRegister(models.Model):
             item.discount = discount
             item.total_discount = item.flat_discount + item.discount_percent
             item.total_amount = item.price - item.total_discount
-
-            # if item.discount>0:
-            #     dis = round(item.price * discount / 100)
-            #     dis_amount=round(item.price-dis)
-            #     item.discount=discount
-            #     item.total_discount=item.price-item.total_amount
-            #     item.total_amount=dis_amount
-            #
-            # elif item.flat_discount>0 or item.discount<=0:
-            #     dis = round(item.total_amount * discount / 100)
-            #     dis_amount = round(item.total_amount - dis)
-            #     item.discount = discount
-            #     item.total_discount = item.price-item.total_amount
-            #     item.total_amount = dis_amount
-        return "X"
 
     @api.onchange('other_discount')
     def onchange_other_discount(self):
@@ -801,23 +723,6 @@ class BillRegister(models.Model):
                 item.flat_discount = round(item.price * discount_distribution)
                 item.total_discount = item.flat_discount + item.discount_percent
                 item.total_amount = item.price - item.total_discount
-
-            # discount_dec=other_discount/total
-            # discount_figure=1-discount_dec
-            #
-            # for item in self.bill_register_line_id:
-            #     dis_amount = round(item.price*discount_figure)
-            #     item.flat_discount =round((item.price-dis_amount))
-            #     item.total_discount = round(item.flat_discount+item.discount)
-            #     item.total_amount =dis_amount
-
-        #
-        #
-        #
-        #
-        # self.grand_total = self.total - self.other_discount
-        # self.due=self.total - self.other_discount- self.paid
-        return 'Y'
 
 
 class TestInformation(models.Model):
@@ -837,7 +742,7 @@ class TestInformation(models.Model):
         return res
 
 
-    name= fields.Many2one("examination.entry", "Item Name", ondelete='cascade')
+    examination_id= fields.Many2one("examination.entry", "Item Name", ondelete='cascade')
 
     bill_register_id= fields.Many2one('bill.register', "Information")
     department= fields.Char("Department")
@@ -854,53 +759,53 @@ class TestInformation(models.Model):
     commission_paid= fields.Boolean("Commission Paid")
 
 
-    def onchange_test(self, cr, uid, ids, name, context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('examination.entry').browse(cr, uid, name, context=None)
+    @api.onchange('examination_id')
+    def onchange_test(self):
+        if not self.examination_id:
+            return
+
+        # Fetch the related examination.entry record
+        dep_object = self.examination_id
+
+        # Calculate the delivery date based on the required time
         delivery_required_days = dep_object.required_time
         delivery_date = date.today() + timedelta(days=delivery_required_days)
-        # import pdb
-        # pdb.set_trace()
-        abc = {'department': dep_object.department.name, 'product_qty': 1, 'price': dep_object.rate,
-               'total_amount': dep_object.rate, 'paid': dep_object.rate,
-               'delivery_date': delivery_date}
-        tests['value'] = abc
-        # import pdb
-        # pdb.set_trace()
-        return tests
+
+        # Update the current record's fields based on the fetched data
+        self.department = dep_object.department.name
+        self.product_qty = 1
+        self.price = dep_object.rate
+        self.total_amount = dep_object.rate
+        self.paid = dep_object.rate
+        self.delivery_date = delivery_date
 
     @api.onchange('product_qty')
     def onchange_qty(self):
         self.total_amount = self.price * self.product_qty
 
-    def onchange_discount(self, cr, uid, ids, price, discount, context=None):
-        tests = {'values': {}}
+    @api.onchange('discount')
+    def onchange_discount(self):
 
-        dis_amount = round(price - (price * discount / 100))
+        dis_amount = round(self.price - (self.price * self.discount / 100))
+        self.total_amount= dis_amount
+        self.total_discount= dis_amount
 
-        abc = {'total_amount': dis_amount, 'total_discount': dis_amount}
-        tests['value'] = abc
+    def create(self, vals):
+        # Create the record using the new API
+        record = super(TestInformation, self).create(vals)
 
-        return tests
-
-    def create(self, cr, uid, vals, context=None):
-        # deliry_min_time
-        stored = super(TestInformation, self).create(cr, uid, vals, context)
-        bill_register_line_object = self.browse(cr, uid, stored, context=context)
-        test_name = bill_register_line_object.name
+        # Access the related test name to get the required time
+        test_name = record.name
         required_time = test_name.required_time
+
+        # Calculate the delivery date
         today = date.today()
         delivery_date = today + timedelta(days=required_time)
-        cr.execute("update bill_register_line set delivery_date=%s where id=%s", (delivery_date, stored))
-        cr.commit()
 
-        # today = datetime.datetime.strftime(datetime.datetime.today(), '%d/%m/%Y-%Hh/%Mm')
+        # Update the record with the calculated delivery date
+        record.delivery_date = delivery_date
 
-        return 0
-
-    # def write(self, cr, uid, vals, context=None):
-    #     import pdb
-    #     pdb.set_trace()
+        return record
 
 
 class AdmissionPaymentLine(models.Model):

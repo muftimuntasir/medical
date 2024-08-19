@@ -35,3 +35,4 @@ access_commission,commission,model_commission,base.group_user,1,1,1,1
 access_commission_configuration,commission.configuration,model_commission_configuration,base.group_user,1,1,1,1
 access_commission_calculation,commission.calculation,model_commission_calculation,base.group_user,1,1,1,1
 access_commission_payment,commission.payment,model_commission_payment,base.group_user,1,1,1,1
+access_payment_type,payment.type,model_payment_type,base.group_user,1,1,1,1

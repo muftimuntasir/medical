@@ -7,9 +7,9 @@ class PaymentType(models.Model):
 
 
 
-    name = fields.char("Name",required=True)
-    account = fields.many2one('account.account', string='Account',required=True)
-    service_charge_account = fields.many2one('account.account', string='Service Charge Account')
-    service_charge = fields.float("Service Charge", required=True)
-    service_charge_flat = fields.char("Service Charge(Flat)")
-    active =fields.boolean("Active")
+    name = fields.Char("Name",required=True)
+    account = fields.Many2one('account.account', string='Account',required=True)
+    service_charge_account = fields.Many2one('account.account', string='Service Charge Account')
+    service_charge = fields.Float("Service Charge", required=True)
+    service_charge_flat = fields.Char("Service Charge(Flat)")
+    active =fields.Boolean("Active")

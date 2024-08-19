@@ -189,7 +189,6 @@ class OPDTicket(models.Model):
             with_doctor_total = with_doctor_total + item.name.total_cash
         self.total = total
         self.with_doctor_total = with_doctor_total
-        return 'O'
 
     def write(self, cr, uid, ids, vals, context=None):
         if vals.get('opd_ticket_line_id') or uid == 1:

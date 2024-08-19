@@ -153,12 +153,6 @@ class leih_admission(models.Model):
         return lists
 
 
-    def onchange_total(self,cr,uid,ids,name,context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('leih.tests').browse(cr, uid, name, context=None)
-        abc = {'total': dep_object.rate}
-        tests['value'] = abc
-        return tests
 
     # def print_bill_register(self, cr, uid, ids, context=None):
     #     '''

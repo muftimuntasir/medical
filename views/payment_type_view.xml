@@ -29,82 +29,81 @@
                 <field name="name">Payment Type</field>
                 <field name="res_model">payment.type</field>
                 <field name="type">ir.actions.act_window</field>
-                <field name="view_type">form</field>
                 <field name="view_mode">tree,form,graph</field>
                 <field name="context">{}</field>
             </record>
 
 
-            <record id="bill_register_inherit_payment" model="ir.ui.view">
-            <field name="name">Bill Register</field>
-            <field name="model">bill.register</field>
-            <field name="inherit_id" ref="leih.investigation_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='total_without_discount']" position="before">
-                    <field name="payment_type"/>
-                </xpath>
-                <xpath expr="//field[@name='paid']" position="after">
-                    <field name="service_charge"/>
-                    <field name="to_be_paid"/>
-                    <field name="account_number"/>
-                </xpath>
-            </field>
-            </record>
+<!--              <record id="bill_register_inherit_payment" model="ir.ui.view">-->
+<!--        <field name="name">Bill Register Form Extension</field>-->
+<!--        <field name="model">bill.register</field>-->
+<!--        <field name="inherit_id" ref="leih.investigation_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; Add payment_type field before total_without_discount &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='total_without_discount']" position="before">-->
+<!--                <field name="payment_type"/>-->
+<!--            </xpath>-->
+<!--            &lt;!&ndash; Add service_charge, to_be_paid, and account_number fields after paid &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='paid']" position="after">-->
+<!--                <field name="service_charge"/>-->
+<!--                <field name="to_be_paid"/>-->
+<!--                <field name="account_number"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
-    <!--        inherit admission form-->
-            <record id="leih_admission_inherit_payment" model="ir.ui.view">
-            <field name="name">Leih Admission</field>
-            <field name="model">leih.admission</field>
-            <field name="inherit_id" ref="leih.admission_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='total_without_discount']" position="before">
-                    <field name="payment_type"/>
-                </xpath>
-                <xpath expr="//field[@name='paid']" position="after">
-                    <field name="service_charge"/>
-                    <field name="to_be_paid"/>
-                    <field name="account_number"/>
-                </xpath>
-            </field>
-            </record>
+<!--    &lt;!&ndash; Inherit and extend the Leih Admission view &ndash;&gt;-->
+<!--    <record id="leih_admission_inherit_payment" model="ir.ui.view">-->
+<!--        <field name="name">Leih Admission Form Extension</field>-->
+<!--        <field name="model">leih.admission</field>-->
+<!--        <field name="inherit_id" ref="leih.admission_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; Add payment_type field before total_without_discount &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='total_without_discount']" position="before">-->
+<!--                <field name="payment_type"/>-->
+<!--            </xpath>-->
+<!--            &lt;!&ndash; Add service_charge, to_be_paid, and account_number fields after paid &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='paid']" position="after">-->
+<!--                <field name="service_charge"/>-->
+<!--                <field name="to_be_paid"/>-->
+<!--                <field name="account_number"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
 
-
-
-    <!--        inherit admission form-->
-            <record id="leih_general_admission_inherit_payment" model="ir.ui.view">
-            <field name="name">Leih Admission</field>
-            <field name="model">hospital.admission</field>
-            <field name="inherit_id" ref="leih.general_admission_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='total_without_discount']" position="before">
-                    <field name="payment_type"/>
-                </xpath>
-                <xpath expr="//field[@name='paid']" position="after">
-                    <field name="service_charge"/>
-                    <field name="to_be_paid"/>
-                    <field name="account_number"/>
-                </xpath>
-            </field>
-            </record>
-
-            <record id="leih_optics_inherit_payment" model="ir.ui.view">
-            <field name="name">optics.sale</field>
-            <field name="model">optics.sale</field>
-            <field name="inherit_id" ref="leih.optics_sale_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='total']" position="before">
-                    <field name="payment_type"/>
-                </xpath>
-                <xpath expr="//field[@name='paid']" position="after">
-                    <field name="service_charge"/>
-                    <field name="to_be_paid"/>
-                    <field name="account_number"/>
-                </xpath>
-            </field>
-            </record>
-
-            <menuitem name="Payment type" id="payment_type" parent="leih_opd_menu" action="payment_type_action" groups="leih.group_billing_menu_payment_type,leih.group_billing_menu_bill_register"/>
-
+<!--    &lt;!&ndash; Inherit and extend the General Admission view &ndash;&gt;-->
+<!--    <record id="leih_general_admission_inherit_payment" model="ir.ui.view">-->
+<!--        <field name="name">Leih General Admission Form Extension</field>-->
+<!--        <field name="model">hospital.admission</field>-->
+<!--        <field name="inherit_id" ref="leih.general_admission_view"/>-->
+<!--        <field name="arch" type="xml">-->
+<!--            &lt;!&ndash; Add payment_type field before total_without_discount &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='total_without_discount']" position="before">-->
+<!--                <field name="payment_type"/>-->
+<!--            </xpath>-->
+<!--            &lt;!&ndash; Add service_charge, to_be_paid, and account_number fields after paid &ndash;&gt;-->
+<!--            <xpath expr="//field[@name='paid']" position="after">-->
+<!--                <field name="service_charge"/>-->
+<!--                <field name="to_be_paid"/>-->
+<!--                <field name="account_number"/>-->
+<!--            </xpath>-->
+<!--        </field>-->
+<!--    </record>-->
+<!--         <record id="leih_optics_inherit_payment" model="ir.ui.view">-->
+<!--            <field name="name">optics.sale</field>-->
+<!--            <field name="model">optics.sale</field>-->
+<!--            <field name="inherit_id" ref="leih.optics_sale_view"/>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <xpath expr="//field[@name='total']" position="before">-->
+<!--                    <field name="payment_type"/>-->
+<!--                </xpath>-->
+<!--                <xpath expr="//field[@name='paid']" position="after">-->
+<!--                    <field name="service_charge"/>-->
+<!--                    <field name="to_be_paid"/>-->
+<!--                    <field name="account_number"/>-->
+<!--                </xpath>-->
+<!--            </field>-->
+<!--            </record>-->
 
         </data>
 
