@@ -19,3 +19,5 @@ from . import commission_payment
 from . import sticker_sample
 from . import payment_type
 from . import leih_admission
+from . import inventory_product_entry
+from . import inventory_requisition

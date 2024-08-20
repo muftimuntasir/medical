@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="inventory_product_entry_view" model="ir.ui.view">
+            <field name="name">inventory.product.entry.view</field>
+            <field name="model">inventory.product.entry</field>
+            <field name="arch" type="xml">
+            <form string="Issue of products">
+                                    <header>
+
+<!--                        <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>-->
+
+                        <button string="Product Receive" type="object" name="confirm_transfer" />
+                        <button string="Verify for Adjustment" type="object" name="confirm_finance"/>
+                    </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="date"/>
+                            <field name="reference_no"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="invoice_no"/>
+                        </group>
+                        <group>
+                            <field name="invoice_date"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="chalan_no"/>
+                        </group>
+                        <group>
+                            <field name="chalan_date"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="warehouse_id"/>
+                        <field name="total"/>
+                        <field name="state"/>
+
+                    </group>
+                    <notebook>
+                        <page string="Item Entry">
+                            <field name="inventory_product_entry_line_ids" mode="tree">
+                                <tree string="Select Product" editable="bottom">
+
+<!--                                    <field name="product_name" on_change="onchange_product(product_name, context)" domain="[('categ_id', '!=', 3),('categ_id', '!=', 4)]"/>-->
+                                    <field name="product_name" domain="[('categ_id','not in',(4,5,6,7,8,9,10,11,12))]"/>
+                                    <field name="account_id"/>
+                                    <field name="quantity"/>
+                                     <field name="unit_price"/>
+                                    <field name="total_price"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+        <record id="inventory_product_entry_action" model="ir.actions.act_window">
+            <field name="name">Product Entry</field>
+            <field name="res_model">inventory.product.entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+             <field name="domain">[('state','=','pending')]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="inventory_product_entry_tree" >
+            <field name="name">Inventory</field>
+            <field name="model">inventory.product.entry</field>
+            <field name="arch" type="xml">
+            <tree string="Issue List">
+
+                <field name="name"/>
+                <field name="date"/>
+                <field name="reference_no"/>
+                <field name="grn_id"/>
+                <field name="grn_journal_id"/>
+                <field name="advance_journal_id"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+
+
+<!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
+         <menuitem name="Inventory" id="inventory_operation_menu" parent="medical.menu_medical" sequence="15"/>
+
+        <menuitem name="Pending Inventory Product Entry" id="inventory_entry_menu_mainform" parent="medical.inventory_operation_menu" action="inventory_product_entry_action"/>
+
+    </data>
+</odoo>

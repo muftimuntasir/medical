@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="inventory_requisition_view" model="ir.ui.view">
+            <field name="name">inventory.requisition.view</field>
+            <field name="model">inventory.requisition</field>
+            <field name="arch" type="xml">
+            <form string="Issue of products">
+                                    <header>
+
+<!--                        <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>-->
+
+                        <button string="Confirm" type="object" name="confirm_transfer" />
+                    </header>
+                <sheet>
+
+                    <group>
+                        <field name="date"/>
+                        <field name="reference_no"/>
+                        <field name="warehouse_id"/>
+                        <field name="partner_id"/>
+
+
+                    </group>
+                    <notebook>
+                        <page string="Item Entry">
+                            <field name="inventory_requisition_line_ids" mode="tree">
+                                <tree string="Select Product" editable="bottom">
+
+                                    <field name="product_name"/>
+                                    <field name="quantity"/>
+                                    <field name="available_qty"/>
+
+                                </tree>
+                            </field>
+
+                        </page>
+
+                    </notebook>
+
+
+                </sheet>
+            </form>
+
+            </field>
+
+        </record>
+
+
+        <record id="inventory_requisition_action" model="ir.actions.act_window">
+            <field name="name">Inventory Requisition</field>
+            <field name="res_model">inventory.requisition</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="inventory_requisition_tree" >
+            <field name="name">Inventory</field>
+            <field name="model">inventory.requisition</field>
+            <field name="arch" type="xml">
+            <tree string="Issue List">
+
+                <field name="name"/>
+                <field name="date"/>
+                <field name="reference_no"/>
+                <field name="challan_id"/>
+                <field name="warehouse_id"/>
+                <field name="expense_journal_id"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+
+
+
+
+        <menuitem name="Inventory Requisition" id="inventory_issue_menu_mainform" parent="inventory_operation_menu" action="inventory_requisition_action"/>
+
+    </data>
+</odoo>

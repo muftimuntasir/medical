@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+
+        <record id="inventory_product_entry_verified_action" model="ir.actions.act_window">
+            <field name="name">Product Entry</field>
+            <field name="res_model">inventory.product.entry</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form</field>
+             <field name="domain">[('state','=','verify')]</field>
+            <field name="context">{}</field>
+        </record>
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="inventory_product_entry_verified_tree" >
+            <field name="name">Inventory</field>
+            <field name="model">inventory.product.entry</field>
+            <field name="arch" type="xml">
+            <tree string="Issue List">
+
+                <field name="name"/>
+                <field name="date"/>
+                <field name="reference_no"/>
+                <field name="grn_id"/>
+                <field name="grn_journal_id"/>
+                <field name="advance_journal_id"/>
+                <field name="state"/>
+            </tree>
+            </field>
+        </record>
+
+
+
+
+        <menuitem name="Verified Inventory Product Entry" id="inventory_entry_menu_verified_mainform" parent="inventory_operation_menu" action="inventory_product_entry_verified_action"/>
+
+    </data>
+</odoo>

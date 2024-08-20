@@ -40,3 +40,10 @@ access_payment_type,payment.type,model_payment_type,base.group_user,1,1,1,1
 access_leih_admission,leih.admission,model_leih_admission,base.group_user,1,1,1,1
 access_leih_admission_line,leih.admission.line,model_leih_admission_line,base.group_user,1,1,1,1
 access_admission_payment_line,admission.payment.line,model_admission_payment_line,base.group_user,1,1,1,1
+
+access_inventory_product_entry,inventory.product.entry,model_inventory_product_entry,base.group_user,1,1,1,1
+access_inventory_product_entry_line,inventory.product.entry.line,model_inventory_product_entry_line,base.group_user,1,1,1,1
+
+access_inventory_requisition,inventory.requisition,model_inventory_requisition,base.group_user,1,1,1,1
+access_inventory_requisition_line,inventory.requisition.line,model_inventory_requisition_line,base.group_user,1,1,1,1
+

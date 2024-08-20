@@ -40,7 +40,11 @@
         'views/commission_payment_view.xml',
         'views/sticker_view.xml',
         'views/payment_type_view.xml',
-        'views/leih_admission_view.xml'
+        'views/leih_admission_view.xml',
+        'views/inventory_product_entry_view.xml',
+        'views/inventory_product_entry_verified_view.xml',
+        'views/inventory_product_entry_confirmed_view.xml',
+        'views/inventory_requisition_view.xml',
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,
