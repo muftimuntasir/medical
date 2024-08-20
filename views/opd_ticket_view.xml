@@ -17,7 +17,7 @@
                             <!--                        <field name="patient_id"/>-->
                             <!--                        <field name="name"/>-->
                             <field name="date"/>
-                            <field name="patient_id"/>
+                            <field name="patient_id" readonly="true" force_save="1"/>
                             <field name="patient_name"/>
                             <field name="address"/>
                             <field name="age"/>
@@ -49,6 +49,12 @@
 
                         </notebook>
                     </sheet>
+
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
                 </form>
             </field>
         </record>

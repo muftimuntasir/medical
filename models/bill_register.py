@@ -746,6 +746,7 @@ class TestInformation(models.Model):
 
     bill_register_id= fields.Many2one('bill.register', "Information")
     department= fields.Char("Department")
+    name= fields.Char("Name")
     product_qty= fields.Float('Quantity')
     delivery_date= fields.Date("Delivery Date")
     date= fields.Datetime("Date", readonly=True, default=lambda self: fields.Datetime.now())
@@ -776,7 +777,7 @@ class TestInformation(models.Model):
         self.product_qty = 1
         self.price = dep_object.rate
         self.total_amount = dep_object.rate
-        self.paid = dep_object.rate
+        self.bill_register_id.paid = dep_object.rate
         self.delivery_date = delivery_date
 
     @api.onchange('product_qty')
@@ -793,17 +794,6 @@ class TestInformation(models.Model):
     def create(self, vals):
         # Create the record using the new API
         record = super(TestInformation, self).create(vals)
-
-        # Access the related test name to get the required time
-        test_name = record.name
-        required_time = test_name.required_time
-
-        # Calculate the delivery date
-        today = date.today()
-        delivery_date = today + timedelta(days=required_time)
-
-        # Update the record with the calculated delivery date
-        record.delivery_date = delivery_date
 
         return record
 

@@ -12,12 +12,12 @@ class LeihAdmission(models.Model):
 
 
     name=fields.Char("Name")
-    mobile= fields.Char(string="Mobile",store=False)
+    mobile= fields.Char(string="Mobile")
     patient_id= fields.Char(related='patient_name.patient_id',string="Patient Id")
     patient_name= fields.Many2one('patient.info', "Patient Name")
-    address= fields.Char("Address",store=False)
-    age= fields.Char("Age",store=False)
-    sex=fields.Char("Sex",store=False)
+    address= fields.Char("Address")
+    age= fields.Char("Age")
+    sex=fields.Char("Sex")
     ref_doctors= fields.Many2one('doctors.profile','Reffered by')
     operation_date= fields.Date("Operation Date")
     release_note= fields.Text("Release Note")

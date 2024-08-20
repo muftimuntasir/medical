@@ -1,12 +1,12 @@
 from odoo import api, models, fields
 
-class brokers_info(models.Model):
+class BrokersInfo(models.Model):
     _name = "brokers.info"
     _rec_name = 'broker_name'
 
 
 
-    broker_id= fields.Char(string="Broker ID", readonly=True)
+    broker_id= fields.Char(string="Broker ID")
     broker_name= fields.Char("Broker Name", required=True)
     status= fields.Selection([('active', 'Active'),('inactive', 'Inactive')], string='Status', default='active')
     commission_rate= fields.Float("Commission Rate (%) ")
@@ -15,11 +15,7 @@ class brokers_info(models.Model):
     # doctor_ids= fields.Many2many('doctors.profile', 'referral_relation', 'broker_id', 'doctor_id', "Broker Name")
 
 
-    def create(self, cr, uid, vals, context=None):
-        if context is None: context = {}
-        record = super(brokers_info, self).create(cr, uid, vals, context)
-        if record is not None:
-            name_text = 'BR-1001' + str(record)
-            cr.execute('update brokers_info set broker_id=%s where id=%s', (name_text, record))
-            cr.commit()
+    def create(self, vals):
+        record = super(BrokersInfo, self).create(vals)
+        record.broker_id = 'BR-1001' + str(record.id)
         return record

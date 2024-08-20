@@ -1,6 +1,6 @@
 from odoo import api, models, fields
 
-class doctors_profile(models.Model):
+class DoctorsProfile(models.Model):
     _name = "doctors.profile"
 
 
@@ -25,11 +25,10 @@ class doctors_profile(models.Model):
     is_referral= fields.Boolean("Is Referral?")
 
 
-    def create(self, cr, uid, vals, context=None):
-        if context is None: context = {}
-        record = super(doctors_profile, self).create(cr, uid, vals, context)
+    def create(self,vals):
+
+        record = super(DoctorsProfile, self).create(vals)
         if record is not None:
-            name_text = 'D-900' + str(record)
-            cr.execute('update doctors_profile set doctor_id=%s where id=%s', (name_text, record))
-            cr.commit()
+            record.doctor_id = 'D-900' + str(record.id)
+
         return record
