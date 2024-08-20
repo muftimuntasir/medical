@@ -34,12 +34,6 @@ class ExaminationEntry(models.Model):
 
     @api.model
     def create(self, vals):
-        if vals.get('sample_req') and not vals.get('sample_type'):
-            raise UserError(_('Sample type must be defined if sample is required.'))
-
-        if vals.get('manual') and not vals.get('examination_entry_line_ids') and vals.get('sample_req'):
-            raise UserError(_('Test name should exist if manual and sample is required.'))
-
         return super(ExaminationEntry, self).create(vals)
 
 
