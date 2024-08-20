@@ -1,29 +1,10 @@
-from odoo import api, models, fields
+from odoo import api, models, fields,_
+from odoo.addons.base.models.res_currency import amount_to_text
 
 class leih_admission(models.Model):
     _name = "leih.admission"
     _order = 'id desc'
 
-
-
-
-    def _totalpayable(self, cr, uid, ids, field_name, arg, context=None):
-        Percentance_calculation = {}
-        sum = 0
-        for items in self.pool.get("leih.admission").browse(cr,uid,ids,context=None):
-            total_list=[]
-            for amount in items.leih_admission_line_id:
-                total_list.append(amount.total_amount)
-
-            for item in total_list:
-                sum=item+sum
-
-
-                for record in self.browse(cr, uid, ids, context=context):
-                    Percentance_calculation[record.id] = sum
-                    # import pdb
-                    # pdb.set_trace()
-        return Percentance_calculation
     def _default_payment_type(self):
          return self.env['payment.type'].search([('name', '=', 'Cash')], limit=1).id
 
@@ -86,6 +67,9 @@ class leih_admission(models.Model):
 
 
     _defaults = {
+
+
+
         'user_id': lambda obj, cr, uid, context: uid,
     }
     @api.onchange("payment_type")
@@ -99,7 +83,6 @@ class leih_admission(models.Model):
             else:
                 self.to_be_paid=self.paid
                 self.service_charge=0
-        return "X"
 
     @api.multi
     def amount_to_text(self, amount, currency='Bdt'):
@@ -153,15 +136,7 @@ class leih_admission(models.Model):
         return lists
 
 
-
-    # def print_bill_register(self, cr, uid, ids, context=None):
-    #     '''
-    #     This function prints the sales order and mark it as sent, so that we can see more easily the next step of the workflow
-    #     '''
-    #     assert len(ids) == 1, 'This option should only be used for a single id at a time'
-    #
-    #     return self.pool['report'].get_action(cr, uid, ids, 'sale.report_saleorder', context=context)
-
+    @api.onchange("patient_name")
     def onchange_patient(self,cr,uid,ids,name,context=None):
         tests={}
         dep_object = self.pool.get('patient.info').browse(cr, uid, name, context=None)
@@ -169,21 +144,7 @@ class leih_admission(models.Model):
         tests['value']=abc
         return tests
 
-    # def _package_fields(self, cr, uid, context=None):
-    #     return list(PACKAGE_FIELDS)
-
-    # def onchange_mobile(self,cr,uid,ids,mobile,context=None):
-    #     tests={'values':{}}
-    #     patient_id=self.pool.get('patient.info').search(cr,uid,[('mobile', '=', mobile)],context=None)
-    #     dep_object=self.pool.get('patient.info').browse(cr,uid,patient_id,context)
-    #     abc = {'patient': dep_object.name, 'address': dep_object.address, 'age': dep_object.age, 'sex': dep_object.sex}
-    #     tests['value']=abc
-    #     return tests
-
-        #
-        # import pdb
-        # pdb.set_trace()
-
+    @api.onchange('package_name')
     def onchange_package(self,cr,uid,ids,package_name,vals,context=None):
         values={}
         if not package_name:
@@ -844,7 +805,7 @@ class test_information(models.Model):
         return res
 
 
-    name= fields.Many2one("examination.entry","Item Name",ondelete='cascade')
+    examination_id= fields.Many2one("examination.entry","Item Name",ondelete='cascade')
     leih_admission_id= fields.Many2one('leih.admission', "Information")
     department= fields.Char("Department")
     price= fields.Float("Price")
@@ -855,7 +816,7 @@ class test_information(models.Model):
     total_amount= fields.Float("Total Amount")
 
 
-
+    @api.onchange('examination_id')
     def onchange_test(self,cr,uid,ids,name,context=None):
         tests = {'values': {}}
         dep_object = self.pool.get('examination.entry').browse(cr, uid, name, context=None)
@@ -865,6 +826,7 @@ class test_information(models.Model):
         # pdb.set_trace()
         return tests
 
+    @api.onchange('discount')
     def onchange_discount(self,cr,uid,ids,name,discount,context=None):
         tests = {'values': {}}
         dep_object = self.pool.get('examination.entry').browse(cr, uid, name, context=None)

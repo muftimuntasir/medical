@@ -24,14 +24,14 @@
                         <field name="date"/>
 
                         <field name="patient_id"/>
-                        <field name="patient_name" on_change="onchange_patient(patient_name, context)" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
+                        <field name="patient_name" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                         <field name="address"/>
                         <field name="age"/>
                         <field name="sex"/>
                         <field name="mobile"/>
                         <field name="ref_doctors" placeholder="Select Doctor Name" options="{'no_quick_create': True, 'no_create_edit' : True}"/>
                         <field name="operation_date"/>
-                        <field name="package_name" on_change="onchange_package(package_name,context)"/>
+                        <field name="package_name"/>
                         <field name="emergency"/>
                         <field name="release_note" readonly="1"/>
                             </group>
@@ -55,10 +55,10 @@
                             <field name="leih_admission_line_id" mode="tree">
                                 <tree string="Select Referance Value" editable="bottom">
 
-                                    <field name="name" on_change="onchange_test(name, context)"/>
+                                    <field name="examination_id"/>
                                     <field name="department"/>
                                     <field name="price"/>
-                                    <field name="discount" on_change="onchange_discount(name,discount,context)"/>
+                                    <field name="discount"/>
                                     <field name="discount_percent"/>
                                     <field name="flat_discount"/>
                                     <field name="total_discount"/>

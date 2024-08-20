@@ -1,6 +1,6 @@
 from odoo import api, models, fields
 
-class patient_info(models.Model):
+class PatientInfo(models.Model):
     _name = "patient.info"
 
 
@@ -44,20 +44,6 @@ class patient_info(models.Model):
         return result
 
 
-    @api.constrains('mobile')
-    def _check_mobile(self):
-
-        for rec in self:
-
-            if rec.mobile and len(rec.mobile) != 11:
-
-                raise ValidationError(_("Mobile Number Should be 11 digit"))
-
-        return True
-
-
-
-
     mobile= fields.Char("Mobile No")
     patient_id= fields.Char("Patient Id", readonly=True)
     name=fields.Char("Name", required=True)
@@ -70,35 +56,36 @@ class patient_info(models.Model):
         [('created', 'Created'), ('notcreated', 'Notcreated')],
         'Status', default='notcreated', readonly=True)
 
+    @api.model
+    def create(self, vals):
+        # Call the original create method
+        record = super(PatientInfo, self).create(vals)
 
-    def create(self, cr, uid, vals, context=None):
+        # Update patient_id and state after record creation
+        if record:
+            name_text = f'P-0{record.id}'
+            record.write({
+                'patient_id': name_text,
+                'state': 'created',
+            })
 
-        stored_id=super(patient_info, self).create(cr, uid, vals, context=context)
-        if stored_id is not None:
-            name_text = 'P-0' + str(stored_id)
-            cr.execute('update patient_info set patient_id=%s where id=%s', (name_text, stored_id))
-            cr.execute('update patient_info set state=%s where id=%s', ('created', stored_id))
-            cr.commit()
+        return record
 
-        return stored_id
+    def write(self, vals):
+        # Retrieve the record(s) to be updated
+        records = self.browse(self.ids)
 
-    def write(self, cr, uid, ids, vals, context=None):
-        change_patient= self.browse(cr, uid, ids, context)
-        if "age" in vals:
-            newage=vals['age']
-        # query="select name from opd_ticket where patient_id=%"
-        # cr.execute(query, (ids))
-        # import pdb
-        # pdb.set_trace()
+        if 'age' in vals:
+            new_age = vals['age']
+            # Handle age update logic if needed
 
-        return super(patient_info, self).write(cr, uid, ids, vals, context=context)
+        # Update the records using the super method
+        return super(PatientInfo, self).write(vals)
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         args = args or []
         recs = self.browse()
-        # test_val=self.search([])
-
         if name:
             recs = self.search([('patient_id', '=', name)] + args, limit=limit)
 
