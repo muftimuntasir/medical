@@ -40,6 +40,7 @@
         'views/commission_payment_view.xml',
         'views/sticker_view.xml',
         'views/payment_type_view.xml',
+        'views/leih_admission_view.xml'
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,

@@ -1,7 +1,8 @@
 from odoo import api, models, fields,_
-from odoo.addons.base.models.res_currency import amount_to_text
+# from odoo.addons.base.models.res_currency import amount_to_text
+from odoo.exceptions import UserError
 
-class leih_admission(models.Model):
+class LeihAdmission(models.Model):
     _name = "leih.admission"
     _order = 'id desc'
 
@@ -22,7 +23,6 @@ class leih_admission(models.Model):
     release_note= fields.Text("Release Note")
     package_name= fields.Many2one("examine.package", string="Package")
     leih_admission_line_id= fields.One2many('leih.admission.line', 'leih_admission_id', 'Investigations')
-    guarantor_line_id=fields.One2many("patient.guarantor","admission_id","Guarantor Name")
     bill_register_admission_line_id= fields.One2many("bill.register.admission.line","admission_line_id","Bill Register")
     admission_payment_line_id= fields.One2many("admission.payment.line","admission_payment_line_id","Admission Payment")
     admission_journal_relation_id= fields.One2many("bill.journal.relation", "admission_journal_relation_id", "Journal")
@@ -72,560 +72,234 @@ class leih_admission(models.Model):
 
         'user_id': lambda obj, cr, uid, context: uid,
     }
+
     @api.onchange("payment_type")
     def onchnage_payment_type(self):
-        if self.payment_type.active==True:
-            interest=self.payment_type.service_charge
-            if interest>0:
-                service_charge=(self.paid*interest)/100
-                self.service_charge=service_charge
-                self.to_be_paid=self.paid+service_charge
+        if self.payment_type and self.payment_type.active:
+            interest = self.payment_type.service_charge
+            if interest > 0:
+                service_charge = (self.paid * interest) / 100
+                self.service_charge = service_charge
+                self.to_be_paid = self.paid + service_charge
             else:
-                self.to_be_paid=self.paid
-                self.service_charge=0
+                self.to_be_paid = self.paid
+                self.service_charge = 0
 
-    @api.multi
-    def amount_to_text(self, amount, currency='Bdt'):
-        text = amount_to_text(amount, currency)
-        new_text = text.replace("euro", "Taka")
-        # initializing sub string
-        sub_str = "Taka"
-        final_text = new_text[:new_text.index(sub_str) + len(sub_str)]
+    # def amount_to_text(self, amount, currency='Bdt'):
+    #     text = self.env['ir.qweb.field.monetary'].amount_to_text(amount, currency)
+    #     new_text = text.replace("euro", "Taka")
+    #     sub_str = "Taka"
+    #     final_text = new_text[:new_text.index(sub_str) + len(sub_str)]
+    #     return final_text
 
-
-        # final_text = new_text.replace("Cent", "Paisa")
-        return final_text
-
-
-    @api.multi
-    def advance_paid(self,name):
+    def advance_paid(self, name):
         mr = self.env['leih.money.receipt'].search([('admission_id', '=', name)])
-        advance = 0
-        paid = 0
-        if len(mr)>2:
-            for i in range(len(mr)-1):
-                advance=advance+mr[i].amount
-            paid=mr[len(mr)-1].amount
-        # mr_ids=self.pool.get('leih.money.receipt').search([('bill_id', '=', name)], context=context)
-
-            lists={
-                'advance':advance,
-                'paid':paid
-            }
-        elif len(mr)==2:
-            advance = advance + mr[0].amount
-            paid = paid + mr[1].amount
-            lists={
-                'advance':advance,
-                'paid':paid
-            }
-        elif len(mr)==1:
-            advance = advance + mr[0].amount
-            lists={
-                'advance':advance,
-                'paid':0
-            }
-        elif len(mr)==0:
-            advance = advance
-            lists={
-                'advance':advance,
-                'paid':0
-            }
-
-        # final_text = new_text.replace("Cent", "Paisa")
-        return lists
-
+        advance = sum(mr[:-1].mapped('amount'))
+        paid = mr[-1].amount if len(mr) > 1 else 0
+        return {'advance': advance, 'paid': paid}
 
     @api.onchange("patient_name")
-    def onchange_patient(self,cr,uid,ids,name,context=None):
-        tests={}
-        dep_object = self.pool.get('patient.info').browse(cr, uid, name, context=None)
-        abc={'mobile':dep_object.mobile,'address':dep_object.address,'age':dep_object.age,'sex':dep_object.sex}
-        tests['value']=abc
-        return tests
+    def onchange_patient(self):
+        if self.patient_name:
+            self.update({
+                'mobile': self.patient_name.mobile,
+                'address': self.patient_name.address,
+                'age': self.patient_name.age,
+                'sex': self.patient_name.sex,
+            })
 
     @api.onchange('package_name')
-    def onchange_package(self,cr,uid,ids,package_name,vals,context=None):
-        values={}
-        if not package_name:
-            return {}
-        total_amount = 0.0
-        abc={'leih_admission_line_id':[]}
-        package_object=self.pool.get('examine.package').browse(cr,uid,package_name,context=None)
-        abc['other_discount'] = package_object.total_without_discount -package_object.total
+    def onchange_package(self):
+        if self.package_name:
+            total_amount = 0.0
+            leih_admission_lines = []
+            for item in self.package_name.examine_package_line_id:
+                total_amount += item.total_amount
+                leih_admission_lines.append((0, 0, {
+                    'name': item.name.id,
+                    'total_amount': item.total_amount,
+                    'price': item.price,
+                    'flat_discount': item.discount,
+                }))
+            self.update({
+                'leih_admission_line_id': leih_admission_lines,
+                'other_discount': self.package_name.total_without_discount - self.package_name.total,
+            })
 
-        for item in package_object.examine_package_line_id:
-            items=item.name.id
+    def change_status(self):
+        journal_obj = self.env['bill.journal.relation']
+        if self.state == 'activated':
+            raise UserError(_('Already this Bill is Confirmed.'))
 
-            total_amount = total_amount + item.total_amount
-
-
-
-            abc['leih_admission_line_id'].append([0, False, {'name':item.name.id,'total_amount':item.total_amount,'price':item.price,'flat_discount':item.discount}])
-        values['value']=abc
-
-        return values
-
-
-    def change_status(self, cr, uid, ids, context=None):
-        stored_obj = self.browse(cr, uid, [ids[0]], context=context)
-        journal_object = self.pool.get("bill.journal.relation")
-        ## Bill Status Will Change
-
-        if stored_obj.state == 'activated':
-            raise osv.except_osv(_('Warning!'),
-                                 _('Already this Bill is Confirmed.'))
-
-        stored = int(ids[0])
-
-
-        ### check and merged with Lab report
-
-        get_all_tested_ids = []
-
-        for items in stored_obj.leih_admission_line_id:
-            get_all_tested_ids.append(items.name.id)
-
-        ### Ends here merged Section
-
+        get_all_tested_ids = self.leih_admission_line_id.mapped('name.id')
         already_merged = []
-        custom_name = ''
 
-        for items in stored_obj.leih_admission_line_id:
-            custom_name = ''
-            state = 'sample'
-            ### Create LAB/SAMPLE From Here
-            if items.name.sample_req == False or items.name.sample_req == None:
-                state = 'lab'
-            if items.name.indoor==True:
-                state='indoor'
+        for item in self.leih_admission_line_id:
+            custom_name = item.name.name
+            state = 'sample' if not item.name.sample_req else 'lab'
+            if item.name.indoor:
+                state = 'indoor'
 
-            if items.name.manual != True or items.name.lab_not_required != True:
+            if not (item.name.manual or item.name.lab_not_required):
+                value = {
+                    'admission_id': self.id,
+                    'test_id': item.name.id,
+                    'department_id': item.name.department.id,
+                    'state': state,
+                    'sticker_line_id': [(0, 0, {
+                        'test_name': line.name,
+                        'ref_value': line.reference_value,
+                        'bold': line.bold,
+                        'group_by': line.group_by
+                    }) for line in item.name.examination_entry_line],
+                    'full_name': custom_name
+                }
 
-                custom_name = custom_name + ' ' + str(items.name.name)
+                if item.name.merge:
+                    for entry in item.name.merge_ids:
+                        test_id = entry.examinationentry_id.id
+                        if test_id in get_all_tested_ids:
+                            already_merged.append(test_id)
+                            value['full_name'] += ', ' + entry.examinationentry_id.name
+                            value['sticker_line_id'] += [(0, 0, {
+                                'test_name': line.name,
+                                'ref_value': line.reference_value,
+                                'bold': line.bold,
+                                'group_by': line.group_by
+                            }) for line in entry.examinationentry_id.examination_entry_line]
 
-                if items.name.id not in already_merged:
+                sample_obj = self.env['diagnosis.sticker'].create(value)
+                sample_obj.name = 'Lab-0' + str(sample_obj.id)
 
-                    child_list = []
-                    value = {
-                        'admission_id': int(stored),
-                        'test_id': int(items.name.id),
-                        'department_id': items.name.department.name,
-                        'state': state
-                    }
-
-                    for test_item in items.name.examination_entry_line:
-                        tmp_dict = {}
-                        tmp_dict['test_name'] = test_item.name
-                        tmp_dict['ref_value'] = test_item.reference_value
-                        tmp_dict['bold'] = test_item.bold
-                        tmp_dict['group_by'] = test_item.group_by
-                        child_list.append([0, False, tmp_dict])
-
-                    if items.name.merge == True:
-
-                        for entry in items.name.merge_ids:
-                            test_id = entry.examinationentry_id.id
-
-                            if test_id in get_all_tested_ids:
-                                custom_name = custom_name + ', ' + str(entry.examinationentry_id.name)
-                                already_merged.append(test_id)
-                                for m_test_line in entry.examinationentry_id.examination_entry_line:
-                                    tmp_dict = {}
-                                    tmp_dict['test_name'] = m_test_line.name
-                                    tmp_dict['ref_value'] = m_test_line.reference_value
-                                    tmp_dict['bold'] = m_test_line.bold
-                                    tmp_dict['group_by'] = m_test_line.group_by
-                                    child_list.append([0, False, tmp_dict])
-
-                    value['sticker_line_id'] = child_list
-
-                    value['full_name'] = custom_name
-
-                    sample_obj = self.pool.get('diagnosis.sticker')
-                    sample_id = sample_obj.create(cr, uid, value, context=context)
-
-                ### Ends Here LAB/SAMPLE From Here
-
-                if sample_id is not None:
-                    sample_text = 'Lab-0' + str(sample_id)
-                    cr.execute('update diagnosis_sticker set name=%s where id=%s', (sample_text, sample_id))
-                    cr.commit()
-
+        # Journal Entry Creation
+        period = self.env['account.period'].find(self.date)[:1]
         has_been_paid = 0
-            ### Journal ENtry will be here
-        if stored_obj:
-            line_ids = []
+        account_id = self.payment_type.account.id if self.payment_type.name == 'Visa Card' else 6
 
-            if context is None: context = {}
-            if context.get('period_id', False):
-                return context.get('period_id')
-            periods = self.pool.get('account.period').find(cr, uid, context=context)
-            period_id = periods and periods[0] or False
-            # if mehtod is cash
-            if stored_obj.payment_type.name == 'Cash':
-                has_been_paid = stored_obj.paid
-                ar_amount = stored_obj.due
-                account_id = 6
-            elif stored_obj.payment_type.name == 'Visa Card':
-                has_been_paid = stored_obj.to_be_paid
-                ar_amount = stored_obj.due
-                account_id = stored_obj.payment_type.account.id
+        line_ids = []
+        if self.due > 0:
+            line_ids.append((0, 0, {
+                'name': self.name,
+                'account_id': 195,
+                'debit': self.due,
+            }))
+        if has_been_paid > 0:
+            line_ids.append((0, 0, {
+                'name': self.name,
+                'account_id': account_id,
+                'debit': has_been_paid,
+            }))
+        for cc_obj in self.leih_admission_line_id:
+            line_ids.append((0, 0, {
+                'name': cc_obj.name.name,
+                'account_id': cc_obj.name.accounts_id.id,
+                'credit': cc_obj.total_amount,
+            }))
+        if self.service_charge > 0:
+            line_ids.append((0, 0, {
+                'name': self.payment_type.name,
+                'account_id': self.payment_type.service_charge_account.id,
+                'credit': self.service_charge,
+            }))
 
-            if ar_amount > 0:
-                line_ids.append((0, 0, {
-                    'analytic_account_id': False,
-                    'tax_code_id': False,
-                    'tax_amount': 0,
-                    'name': stored_obj.name,
-                    'currency_id': False,
-                    'credit': 0,
-                    'date_maturity': False,
-                    'account_id': 195,  ### Accounts Receivable ID
-                    'debit': ar_amount,
-                    'amount_currency': 0,
-                    'partner_id': False,
-                }))
+        move_vals = {
+            'journal_id': 2,
+            'date': self.date,
+            'ref': self.name,
+            'line_ids': line_ids,
+        }
+        move = self.env['account.move'].create(move_vals)
+        move.action_post()
 
-            if has_been_paid > 0:
-                line_ids.append((0, 0, {
-                    'analytic_account_id': False,
-                    'tax_code_id': False,
-                    'tax_amount': 0,
-                    'name': stored_obj.name,
-                    'currency_id': False,
-                    'credit': 0,
-                    'date_maturity': False,
-                    'account_id': account_id,  ### Cash ID
-                    'debit': has_been_paid,
-                    'amount_currency': 0,
-                    'partner_id': False,
-                }))
+        self.write({'state': 'activated'})
+        journal_obj.create({'journal_id': move.id, 'admission_journal_relation_id': self.id})
 
-            for cc_obj in stored_obj.leih_admission_line_id:
-                ledger_id = 611
-                try:
-                    ledger_id = cc_obj.name.accounts_id.id
-                except:
-                    ledger_id = 611  ## Diagnostic Income Head , If we don't assign any Ledger
+        # Update money receipt
+        if self.paid:
+            mr_vals = {
+                'date': self.date,
+                'admission_id': self.id,
+                'amount': self.paid,
+                'type': self.payment_type.name,
+                'p_type': 'advance',
+                'bill_total_amount': self.total,
+                'due_amount': self.due,
+            }
+            mr = self.env['leih.money.receipt'].create(mr_vals)
+            mr.name = 'MR#' + str(mr.id)
 
-                if context is None:
-                    context = {}
+            self.env['admission.payment.line'].create({
+                'date': self.date,
+                'amount': self.paid,
+                'type': self.payment_type.name,
+                'admission_payment_line_id': self.id,
+                'money_receipt_id': mr.id,
+            })
 
-                line_ids.append((0, 0, {
-                    'analytic_account_id': False,
-                    'tax_code_id': False,
-                    'tax_amount': 0,
-                    'name': cc_obj.name.name,
-                    'currency_id': False,
-                    'account_id': cc_obj.name.accounts_id.id,
-                    'credit': cc_obj.total_amount,
-                    'date_maturity': False,
-                    'debit': 0,
-                    'amount_currency': 0,
-                    'partner_id': False,
-                }))
-            if stored_obj.service_charge > 0:
-                line_ids.append((0, 0, {
-                    'analytic_account_id': False,
-                    'tax_code_id': False,
-                    'tax_amount': 0,
-                    'name': stored_obj.payment_type.name,
-                    'currency_id': False,
-                    'credit': stored_obj.service_charge,
-                    'date_maturity': False,
-                    'account_id': stored_obj.payment_type.service_charge_account.id,  ### Cash ID
-                    'debit': 0,
-                    'amount_currency': 0,
-                    'partner_id': False,
-                }))
+        return self.env.ref('leih.report_admission').report_action(self)
 
-            jv_entry = self.pool.get('account.move')
+    def admission_cancel(self):
+        # Unlink journal entries
+        move_ids = self.env['account.move'].search([('ref', '=', self.name)])
+        if move_ids:
+            move_ids.button_cancel()
+            move_ids.unlink()
 
-            j_vals = {'name': '/',
-                      'journal_id': 2,  ## Sales Journal
-                      'date': stored_obj.date,
-                      'period_id': period_id,
-                      'ref': stored_obj.name,
-                      'line_id': line_ids
+        # Update admission status
+        self.write({'state': 'cancelled'})
 
-                      }
-            # import pdb
-            # pdb.set_trace()
-
-            saved_jv_id = jv_entry.create(cr, uid, j_vals, context=context)
-            if saved_jv_id > 0:
-                journal_id = saved_jv_id
-                try:
-                    jv_entry.button_validate(cr, uid, [saved_jv_id], context)
-                    cr.execute("update leih_admission set state='activated' where id=%s", (ids))
-                    cr.commit()
-                    journal_dict = {'journal_id': journal_id, 'admission_journal_relation_id': stored_obj.id}
-                    journal_object.create(cr, uid, vals=journal_dict, context=context)
-                    if stored_obj.paid != False:
-                        ad_vals = {
-                            'date': stored_obj.date,
-                            'admission_id': stored_obj.id,
-                            'amount': stored_obj.paid,
-                            'type': stored_obj.type,
-                            'p_type': 'advance',
-                            'bill_total_amount': stored_obj.total,
-                            'due_amount': stored_obj.due,
-                        }
-                        has_been_paid = stored_obj.paid
-                        mr_obj = self.pool.get('leih.money.receipt')
-                        mr_id = mr_obj.create(cr, uid, ad_vals, context=context)
-                        if mr_id is not None:
-                            mr_name = 'MR#' + str(mr_id)
-                            cr.execute('update leih_money_receipt set name=%s where id=%s', (mr_name, mr_id))
-                            cr.commit()
-                            admission_payment_obj = self.pool.get('admission.payment.line')
-                            service_dict = {'date': stored_obj.date, 'amount': stored_obj.paid,
-                                            'type': stored_obj.payment_type.name,
-                                            'admission_payment_line_id': stored_obj.id,
-                                            'money_receipt_id': mr_id}
-                            bill_payment_id = admission_payment_obj.create(cr, uid, vals=service_dict, context=context)
-                except:
-                    import pdb
-                    pdb.set_trace()
-            ###close here
-
-        return self.pool['report'].get_action(cr, uid, ids, 'leih.report_admission', context=context)
-
-
-    def admission_cancel(self, cr, uid, ids, context=None):
-
-        #unlink journal items
-        cr.execute("select  id as jounral_id from account_move where ref = (select name from leih_admission where id=%s limit 1)",(ids))
-        joural_ids = cr.fetchall()
-        context = context
-
-        itm = [itm[0] for itm in joural_ids]
-        if len(itm) > 0:
-            uid = 1
-            moves = self.pool.get('account.move').browse(cr, uid, itm, context=context)
-            moves.button_cancel()  ## Cancelling
-            moves.unlink()  ### Deleting Journal
-        ## Bill Status Will Change
-
-        cr.execute("update leih_admission set state='cancelled' where id=%s", (ids))
-        cr.commit()
-        ## Lab WIll be Deleted
-
-        # cr.execute("update diagnosis_sticker set state='cancel' where bill_register_id=%s", (ids))
-        # cr.commit()
-
+        # Update money receipts
+        self.env['leih.money.receipt'].search([('admission_id', '=', self.id)]).write({'state': 'cancelled'})
         #for updates on cash collection
-        cr.execute("update leih_money_receipt set state='cancel' where admission_id=%s", (ids))
-        cr.commit()
+        self.env['leih.money.receipt'].search([('admission_id', '=', self.id)]).write({'state': 'cancel'})
         return True
 
 
+    @api.model
+    def create(self, vals):
+        # Check if the due amount is negative
+        if vals.get("due") and vals.get("due") < 0:
+            raise UserError(_('Check paid and grand total!'))
 
-    def add_new_test(self, cr, uid, ids, context=None):
-        if not ids: return []
+        # Create the record using super
+        admission = super(LeihAdmission, self).create(vals)
 
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'add_bill_view')
-        #
-        inv = self.browse(cr, uid, ids[0], context=context)
-        # import pdb
-        # pdb.set_trace()
-        return {
-            'name':_("Pay Invoice"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'add.bill',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': {
-                'leih_admission_id': ids[0]
-
-                # 'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
-                # 'default_amount': inv.type in ('out_refund', 'in_refund') and -inv.residual or inv.residual,
-                # 'default_reference': inv.name,
-                # 'close_after_process': True,
-                # 'invoice_type': inv.type,
-                # 'invoice_id': inv.id,
-                # 'default_type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
-                # 'type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment'
-            }
-        }
-        raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
-
-    def btn_final_settlement(self, cr, uid, ids, context=None):
-        if not ids: return []
-
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'admission_release_view')
-        #
-        inv = self.browse(cr, uid, ids[0], context=context)
-        total=inv.total
-        # import pdb
-        # pdb.set_trace()
-        return {
-            'name':_("Pay Invoice"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'admission.release',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': {
-                'default_total':total,
-                'default_admission_id': ids[0]
-
-            }
-        }
-        raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
-
-
-    def btn_pay(self, cr, uid, ids, context=None):
-        if not ids: return []
-
-        inv = self.browse(cr, uid, ids[0], context=context)
-        if inv.state == 'pending' or inv.state=='cancelled':
-            raise osv.except_osv(_('Warning'), _('Please Confirm and Print the Bill'))
-        if inv.total <= inv.paid:
-            raise osv.except_osv(_('Full Paid'), _('Nothing to Pay Here. Already Full Paid'))
-
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'admission_payment_form_view')
-        #
-
-        # total=inv.total
-        # import pdb
-        # pdb.set_trace()
-        return {
-            'name':_("Pay Invoice"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'admission.payment',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': {
-                'default_admission_id': ids[0],
-                'default_amount': inv.due
-            }
-        }
-        raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
-
-
-    def add_discount(self,cr,uid,ids,context=None):
-        # import pdb
-        # pdb.set_trace()
-        if not ids: return []
-
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih', 'discount_view')
-        #
-        inv = self.browse(cr, uid, ids[0], context=context)
-        # import pdb
-        # pdb.set_trace()
-        return {
-            'name': _("Pay Invoice"),
-            'view_mode': 'form',
-            'view_id': view_id,
-            'view_type': 'form',
-            'res_model': 'discount',
-            'type': 'ir.actions.act_window',
-            'nodestroy': True,
-            'target': 'new',
-            'domain': '[]',
-            'context': {
-                'pi_id':ids[0]
-                # 'default_price': 500,
-                # # 'default_name':context.get('name', False),
-                # 'default_total_amount': 200,
-                # 'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
-                # 'default_amount': inv.type in ('out_refund', 'in_refund') and -inv.residual or inv.residual,
-                # 'default_reference': inv.name,
-                # 'close_after_process': True,
-                # 'invoice_type': inv.type,
-                # 'invoice_id': inv.id,
-                # 'default_type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
-                # 'type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment'
-            }
-        }
-        raise osv.except_osv(_('Error!'), _('There is no default company for the current user!'))
-
-
-    def create(self, cr, uid, vals, context=None):
-        if vals.get("due"):
-            if vals.get("due")<0:
-                raise osv.except_osv(_('Warning!'),
-                                     _("Check paid and grand total!"))
-
-        if context is None:
-            context = {}
-        # import pdb
-        # pdb.set_trace()
-        stored = super(leih_admission, self).create(cr, uid, vals, context)  # return ID int object
-
-        if vals.get("emergency")==False:
-
-
-            if stored is not None:
-                name_text = 'A-0' + str(stored)
-                cr.execute('update leih_admission set name=%s where id=%s', (name_text, stored))
-                cr.commit()
+        # Generate the name field based on whether it's an emergency
+        if not vals.get("emergency", False):
+            name_text = 'A-0' + str(admission.id)
         else:
-            if stored is not None:
-                name_text = 'E-0' + str(stored)
-                cr.execute('update leih_admission set name=%s where id=%s', (name_text, stored))
-                cr.commit()
+            name_text = 'E-0' + str(admission.id)
 
+        # Update the record with the new name
+        admission.name = name_text
 
-        return stored
+        return admission
 
-    def write(self, cr, uid, ids,vals,context=None):
-        if vals.get("due"):
-            if vals.get("due")<0:
-                raise osv.except_osv(_('Warning!'),
-                                     _("Check paid and grand total!"))
+    @api.model
+    def write(self, vals):
+        if vals.get("due") and vals.get("due") < 0:
+            raise UserError(_("Check paid and grand total!"))
 
-        if vals.get('leih_admission_line_id') or uid == 1:
-            cr.execute("select id as journal_ids from account_move where ref = (select name from leih_admission where id=%s limit 1)",(ids))
-            journal_ids = cr.fetchall()
-            context=context
+        if vals.get('leih_admission_line_id') or self.env.uid == 1:
+            journal_moves = self.env['account.move'].search([('ref', '=', self.name)])
+            if journal_moves:
+                journal_moves.button_cancel()
+                journal_moves.unlink()
 
+                bill_journal_ids = self.env['bill.journal.relation'].search([('journal_id', 'in', journal_moves.ids)])
+                if bill_journal_ids:
+                    bill_journal_ids.unlink()
 
-            itm = [itm[0] for itm in journal_ids]
+                super(LeihAdmission, self).write(vals)
 
-            if len(itm)>0:
-
-                uid=1
-                moves =self.pool.get('account.move').browse(cr, uid, itm, context=context)
-                xx=moves.button_cancel() ## Cancelling
-                bill_journal_id=[]
-                # cr.execute("delete from bill_journal_relation where id in (select id from bill_journal_relation where journal_id in %s)",(tuple(itm)))
-                user_q="select id from bill_journal_relation where journal_id in %s"
-                # cr.execute("select id from bill_journal_relation where journal_id in %s",(tuple(itm)))
-                cr.execute(user_q, (tuple(itm),))
-                journal_id = cr.fetchall()
-                for item in journal_id:
-                    bill_journal_id.append(item[0])
-
-                if len(bill_journal_id)>0:
-                    query="delete from bill_journal_relation where id in %s"
-                    cr.execute(query,(tuple(bill_journal_id),))
-
-                moves.unlink()
-                updated=super(leih_admission, self).write(cr, uid, ids, vals, context=context)
-                stored_obj = self.browse(cr, uid, [ids[0]], context=context)
-                journal_object = self.pool.get("bill.journal.relation")
+                stored_obj = self.browse(self.ids)
+                journal_object = self.env['bill.journal.relation']
                 has_been_paid = stored_obj.paid
+
                 if stored_obj:
                     line_ids = []
 
-                    if context is None: context = {}
-                    if context.get('period_id', False):
-                        return context.get('period_id')
-                    periods = self.pool.get('account.period').find(cr, uid, context=context)
+                    periods = self.env['account.period'].find()
                     period_id = periods and periods[0] or False
                     ar_amount = stored_obj.due
 
@@ -638,7 +312,7 @@ class leih_admission(models.Model):
                             'currency_id': False,
                             'credit': 0,
                             'date_maturity': False,
-                            'account_id': 195, ### Accounts Receivable ID
+                            'account_id': 195,  # Accounts Receivable ID
                             'debit': ar_amount,
                             'amount_currency': 0,
                             'partner_id': False,
@@ -653,23 +327,14 @@ class leih_admission(models.Model):
                             'currency_id': False,
                             'credit': 0,
                             'date_maturity': False,
-                            'account_id': 6,  ### Cash ID
+                            'account_id': 6,  # Cash ID
                             'debit': has_been_paid,
                             'amount_currency': 0,
                             'partner_id': False,
                         }))
 
                     for cc_obj in stored_obj.leih_admission_line_id:
-                        ledger_id=611
-                        try:
-                            ledger_id = cc_obj.name.accounts_id.id
-                        except:
-                            ledger_id= 611 ## Diagnostic Income Head , If we don't assign any Ledger
-
-
-
-                        if context is None:
-                            context = {}
+                        ledger_id = cc_obj.name.accounts_id.id if cc_obj.name.accounts_id else 611
 
                         line_ids.append((0, 0, {
                             'analytic_account_id': False,
@@ -677,7 +342,7 @@ class leih_admission(models.Model):
                             'tax_amount': 0,
                             'name': cc_obj.name.name,
                             'currency_id': False,
-                            'account_id': cc_obj.name.accounts_id.id,
+                            'account_id': ledger_id,
                             'credit': cc_obj.total_amount,
                             'date_maturity': False,
                             'debit': 0,
@@ -685,40 +350,52 @@ class leih_admission(models.Model):
                             'partner_id': False,
                         }))
 
+                    jv_entry = self.env['account.move']
 
+                    j_vals = {
+                        'name': '/',
+                        'journal_id': 2,  # Sales Journal
+                        'date': stored_obj.date,
+                        'period_id': period_id.id,
+                        'ref': stored_obj.name,
+                        'line_ids': line_ids,
+                    }
 
+                    saved_jv_id = jv_entry.create(j_vals)
+                    if saved_jv_id:
+                        saved_jv_id.post()
+                        journal_object.create({
+                            'journal_id': saved_jv_id.id,
+                            'admission_journal_relation_id': stored_obj.id,
+                        })
 
-                    jv_entry = self.pool.get('account.move')
+                return True
 
-                    j_vals = {'name': '/',
-                              'journal_id': 2,  ## Sales Journal
-                              'date': stored_obj.date,
-                              'period_id': period_id,
-                              'ref': stored_obj.name,
-                              'line_id': line_ids
+        return super(LeihAdmission, self).write(vals)
 
-                              }
+    def btn_pay(self):
+        self.ensure_one()
 
-                    saved_jv_id = jv_entry.create(cr, uid, j_vals, context=context)
-                    if saved_jv_id > 0:
-                        journal_id = saved_jv_id
-                        try:
-                            jv_entry.button_validate(cr,uid, [saved_jv_id], context)
-                            journal_dict={'journal_id':journal_id,'admission_journal_relation_id':stored_obj.id}
-                            journal_object.create(cr,uid,vals=journal_dict,context=context)
-                        except:
-                            import pdb
-                            pdb.set_trace()
-                            # pass
-                    return updated
-                    ### Ends the journal Entry Here
-            else:
-                updated = super(leih_admission, self).write(cr, uid, ids, vals, context=context)
-                # raise osv.except_osv(_('Warning!'),
-                #                      _("You cannot Edit the bill"))
-                return updated
+        if self.state in ['pending', 'cancelled']:
+            raise UserError(_('Please Confirm and Print the Bill'))
 
+        if self.total <= self.paid:
+            raise UserError(_('Nothing to Pay Here. Already Fully Paid'))
 
+        view = self.env.ref('leih.admission_payment_form_view')
+
+        return {
+            'name': _("Pay Invoice"),
+            'view_mode': 'form',
+            'view_id': view.id,
+            'view_type': 'form',
+            'res_model': 'admission.payment',
+            'type': 'ir.actions.act_window',
+            'target': 'new',
+            'context': {
+                           'default_admission_id': self.id,
+                           'default_amount': self.due
+                       }}
 
     @api.onchange('leih_admission_line_id')
     def onchange_admission_line(self):
@@ -736,7 +413,6 @@ class leih_admission(models.Model):
         self.due = sumalltest - self.paid
         self.total_without_discount = total_without_discount
 
-        return "X"
 
     @api.onchange('paid')
     def onchange_paid(self):
@@ -747,7 +423,6 @@ class leih_admission(models.Model):
                 service_charge = (self.paid * interest) / 100
                 self.service_charge = service_charge
                 self.to_be_paid = self.paid + service_charge
-        return 'x'
 
     @api.onchange('doctors_discounts')
     def onchange_doc_discount(self):
@@ -759,8 +434,6 @@ class leih_admission(models.Model):
             item.discount=discount
             item.total_discount = item.flat_discount + item.discount_percent
             item.total_amount = item.price - item.total_discount
-
-        return "X"
 
     @api.onchange('other_discount')
     def onchange_other_discount(self):
@@ -783,13 +456,10 @@ class leih_admission(models.Model):
             if gd < line_total:
                 item.total_amount = item.total_amount - (line_total - gd)
                 item.flat_discount = item.flat_discount + (line_total - gd)
-        return 'Nothing'
 
 
 class test_information(models.Model):
     _name = 'leih.admission.line'
-
-
 
     def _amount_all(self, cr, uid, ids, field_name, arg, context=None):
         cur_obj = self.pool.get('leih.admission')
@@ -815,26 +485,17 @@ class test_information(models.Model):
     discount_percent= fields.Integer("Discount Percent")
     total_amount= fields.Float("Total Amount")
 
-
     @api.onchange('examination_id')
-    def onchange_test(self,cr,uid,ids,name,context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('examination.entry').browse(cr, uid, name, context=None)
-        abc = {'department':dep_object.department.name,'price': dep_object.rate,'total_amount':dep_object.rate}
-        tests['value'] = abc
-        # import pdb
-        # pdb.set_trace()
-        return tests
+    def onchange_test(self):
+        if self.examination_id:
+            self.department = self.examination_id.department.name
+            self.price = self.examination_id.rate
+            self.total_amount = self.examination_id.rate
 
     @api.onchange('discount')
-    def onchange_discount(self,cr,uid,ids,name,discount,context=None):
-        tests = {'values': {}}
-        dep_object = self.pool.get('examination.entry').browse(cr, uid, name, context=None)
-        abc = {'total_amount':round(dep_object.rate-(dep_object.rate* discount/100))}
-        tests['value'] = abc
-        # import pdb
-        # pdb.set_trace()
-        return tests
+    def onchange_discount(self):
+        if self.examination_id and self.discount:
+            self.total_amount = round(self.examination_id.rate - (self.examination_id.rate * self.discount / 100))
 class admission_bill_register(models.Model):
     _name = 'bill.register.admission.line'
 
@@ -843,13 +504,10 @@ class admission_bill_register(models.Model):
     bill_id=fields.Many2one("bill.register","Bill ID")
     total=fields.Float('Total')
 
-
-    def onchange_bill_id(self,cr,uid,ids,bill_id,context=None):
-        lists={'values':{}}
-        dep_object = self.pool.get('bill.register').browse(cr, uid, bill_id, context=None)
-        bill_info={'total':dep_object.total}
-        lists['value']=bill_info
-        return lists
+    @api.onchange('bill_id')
+    def onchange_bill_id(self):
+        if self.bill_id:
+            self.total = self.bill_id.total
 
 class admission_payment_line(models.Model):
     _name = 'admission.payment.line'

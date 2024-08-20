@@ -9,10 +9,6 @@
             <form string="Investigation">
                 <header>
                     <button string="Confirm and Print" type="object" name="change_status" groups="base.group_user"/>
-                    <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>
-                    <button string="Add Discount" type="object" name="add_discount" groups="base.group_user"/>
-                    <button string="Final Settlement" type="object" name="btn_final_settlement" groups="base.group_user"/>
-                    <button string="Covert to Admission" type="object" name="btn_convert_to_admission" groups="base.group_user" attrs="{'invisible': [('emergency', '=', False)]}"/>
                     <button string="Payment" type="object" name="btn_pay" groups="base.group_user"/>
                     <button string="Cancel" type="object" name="admission_cancel" groups="leih.group_admission_button_cancel"/>
                 </header>
@@ -68,17 +64,6 @@
                             </field>
                           </page>
 
-                        <page string="Guarantor">
-                            <field name="guarantor_line_id" mode="tree">
-                                <tree string="Select Referance Value" editable="top">
-
-                                    <field name="name"/>
-                                    <field name="address"/>
-                                    <field name="relationship"/>
-                                    <field name="contact"/>
-                                </tree>
-                            </field>
-                          </page>
 
                         <page string="Payment Info">
                             <field name="admission_payment_line_id" mode="tree">
@@ -163,8 +148,9 @@
         </record>
 
 
-        <menuitem name="Admission" id="leih_admission_menu" parent="leih_menu" sequence="2"/>
-        <menuitem name="Pending Admission" id="admission_menu_mainform" parent="leih_admission_menu" action="admission_action" groups="leih.group_admission_menu_pending"/>
+
+        <menuitem name="Admission" id="leih_admission_menu" parent="medical.menu_medical" sequence="14"/>
+        <menuitem name="Pending Admission" id="admission_menu_mainform" parent="leih_admission_menu" action="admission_action"/>
 
 
     </data>
