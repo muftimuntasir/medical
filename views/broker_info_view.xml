@@ -10,7 +10,7 @@
                 <sheet>
                     <group string="Broker Profile">
                         <group>
-                            <field name="broker_id"/>
+                            <field name="broker_id" readonly="true" force_save="1"/>
                             <field name="broker_name"/>
                             <field name="commission_rate"/>
                             <field name="status"/>
