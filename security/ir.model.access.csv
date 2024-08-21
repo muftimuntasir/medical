@@ -51,3 +51,7 @@ access_leih_money_receipt,leih.money.receipt,model_leih_money_receipt,base.group
 access_bill_register_payment,bill.register.payment,model_bill_register_payment,base.group_user,1,1,1,1
 access_admission_payment,admission.payment,model_admission_payment,base.group_user,1,1,1,1
 
+
+access_diagnosis_sticker,diagnosis.sticker,model_diagnosis_sticker,base.group_user,1,1,1,1
+access_diagnosis_sticker_line,diagnosis.sticker.line,model_diagnosis_sticker_line,base.group_user,1,1,1,1
+

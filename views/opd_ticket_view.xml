@@ -10,6 +10,8 @@
                     <header>
 <button string="Print" type="object" name="print_opd_ticket" class="btn-primary" groups="base.group_user"/>
 
+
+
 <!--                                groups="leih.group_bill_register_button_cancel"/>-->
                     </header>
                     <sheet>

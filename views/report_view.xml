@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <data>
 
-     <data>
-
-
-        <record model="ir.ui.view" id="sticker_graph_view">
+<record model="ir.ui.view" id="sticker_graph_view">
                 <field name="name">LAB Graph</field>
                 <field name="model">diagnosis.sticker</field>
                 <field name="arch" type="xml">
@@ -15,41 +13,35 @@
                 </field>
         </record>
 
-
-
-        <record id="lab_action" model="ir.actions.act_window">
-            <field name="name">Stickers</field>
+        <record id="report_action" model="ir.actions.act_window">
+            <field name="name">Delivered</field>
             <field name="res_model">diagnosis.sticker</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">tree,form,graph</field>
-             <field name="domain">[('state','=','lab')]</field>
+            <field name="domain">[('state','=','done')]</field>
             <field name="context">{}</field>
         </record>
 
         <!-- expense type tree -->
-        <record model="ir.ui.view" id="lab_tree" >
+        <record model="ir.ui.view" id="report_tree">
             <field name="name">leih</field>
             <field name="model">diagnosis.sticker</field>
             <field name="arch" type="xml">
-            <tree string="Alu List">
+             <tree string="Alu List">
                         <field name="name"/>
                         <field name="full_name"/>
                         <field name="bill_register_id"/>
-                        <field name="admission_id"/>
+                 <field name="admission_id"/>
                         <field name="department_id"/>
-                        <field name="doctor_id"/>
                         <field name="state"/>
+
+
 
             </tree>
             </field>
         </record>
 
 
-
-         
-        <menuitem name="Pending in Lab" id="pending_in_lab" parent="main_lab_section_menu" action="lab_action"/>
-
-
+        <menuitem name="Report" id="report_print" parent="main_lab_section_menu" action="report_action"/>
     </data>
-
 </odoo>

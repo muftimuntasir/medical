@@ -34,8 +34,7 @@
 
 
         <menuitem name="Lab Section" id="main_lab_section_menu" parent="medical.menu_medical" sequence="31" />
-        <menuitem id="sample_collection_menu" name="Sample Collection" parent="main_lab_section_menu"/>
-        <menuitem id="commission_calculation_action_menu" name="Sample Collection List" parent="main_lab_section_menu" action="sample_action"/>
+        <menuitem id="sample_collection_action_menu" name="Sample Collection List" parent="main_lab_section_menu" action="sample_action"/>
 
     </data>
 </odoo>
