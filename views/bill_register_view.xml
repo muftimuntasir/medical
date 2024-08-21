@@ -9,10 +9,10 @@
                 <form string="Investigation">
                     <header>
 <!--                        <button string="Add Discount" type="object" name="add_discount" groups="base.group_user"/>-->
-<!--                        <button string="Add payment" type="object" name="btn_pay_bill" groups="base.group_user"/>-->
+                        <button string="Add payment" type="object" name="btn_pay_bill"/>
 <!--                        <button string="Corporate Discount" type="object" name="btn_corporate_discount" groups="base.group_user"/>-->
-<!--                        <button string="Confirm and Print" type="object" name="bill_confirm" groups="base.group_user"/>-->
-<!--                        <button string="Cancel" type="object" name="bill_cancel" groups="leih.group_bill_register_button_cancel"/>-->
+                        <button string="Confirm and Print" type="object" name="bill_confirm"/>
+                        <button string="Cancel" type="object" name="bill_cancel"/>
                     </header>
                     <sheet>
                         <group>

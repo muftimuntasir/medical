@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.ui.view" id="leih_admission_graph_view">
+                <field name="name">Admission Graph</field>
+                <field name="model">leih.admission</field>
+                <field name="arch" type="xml">
+                    <graph string="">
+                        <field name="patient_name"/>
+                    </graph>
+                </field>
+        </record>
+
+        <record id="admission_activated_action" model="ir.actions.act_window">
+            <field name="name">Admission Form</field>
+            <field name="res_model">leih.admission</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="domain">[('state','=','cancelled'),('emergency','=',False)]</field>
+            <field name="context">{}</field>
+        </record>
+
+
+
+        <!-- expense type tree -->
+        <record model="ir.ui.view" id="admission_activated_tree" >
+            <field name="name">leih</field>
+            <field name="model">leih.admission</field>
+            <field name="arch" type="xml">
+            <tree string="Alu List">
+
+                <field name="name"/>
+                <field name="patient_name"/>
+                        <field name="mobile"/>
+                <!--                        <field name="patient_id"/>-->
+
+                        <field name="grand_total"/>
+                        <field name="paid"/>
+                        <field name="due"/>
+                <field name="state"/>
+
+
+            </tree>
+            </field>
+        </record>
+
+
+<!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
+        <menuitem name="Cancelled Admission" id="admission_cancelled_menu_mainform" parent="leih_admission_menu" action="admission_activated_action"/>
+
+
+    </data>
+</odoo>

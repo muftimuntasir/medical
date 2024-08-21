@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Admission Payment Form View -->
+        <record id="admission_payment_form_view" model="ir.ui.view">
+            <field name="name">admission.payment.form</field>
+            <field name="model">admission.payment</field>
+            <field name="arch" type="xml">
+                <form string="Admission Payment">
+                    <sheet>
+                        <group string="Basic Information">
+                            <group>
+                                <field name="name"/>
+                                <field name="date"/>
+                                <field name="admission_id"/>
+                                <field name="amount"/>
+                                <field name="payment_type"/>
+                                <field name="service_charge"/>
+                                <field name="to_be_paid"/>
+                                <field name="account_number"/>
+                            </group>
+                        </group>
+                        <footer>
+                            <button name="button_add_payment_action" string="Add" type="object" class="btn-primary"/>
+                            <button string="Cancel" class="btn-secondary" special="cancel"/>
+                        </footer>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Admission Payment Tree View -->
+        <record id="admission_payment_tree_view" model="ir.ui.view">
+            <field name="name">admission.payment.tree</field>
+            <field name="model">admission.payment</field>
+            <field name="arch" type="xml">
+                <tree string="Admission Payments" default_order="id desc">
+                    <field name="name"/>
+                    <field name="admission_id"/>
+                    <field name="amount"/>
+                    <field name="payment_type"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Admission Payment Action -->
+        <record id="admission_payment_new_action" model="ir.actions.act_window">
+            <field name="name">Admission Payments</field>
+            <field name="res_model">admission.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">
+                    Click to create a new Payment.
+                </p>
+            </field>
+        </record>
+
+        </data>
+</odoo>

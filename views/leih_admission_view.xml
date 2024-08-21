@@ -8,9 +8,9 @@
             <field name="arch" type="xml">
             <form string="Investigation">
                 <header>
-                    <button string="Confirm and Print" type="object" name="change_status" groups="base.group_user"/>
-                    <button string="Payment" type="object" name="btn_pay" groups="base.group_user"/>
-                    <button string="Cancel" type="object" name="admission_cancel" groups="leih.group_admission_button_cancel"/>
+                    <button string="Confirm and Print" type="object" name="change_status" />
+                    <button string="Payment" type="object" name="btn_pay" />
+                    <button string="Cancel" type="object" name="admission_cancel"/>
                 </header>
                 <sheet>
 

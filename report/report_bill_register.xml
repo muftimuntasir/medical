@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_bill_register">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="doc">
+                    <div class="page" style="font-size: 16px !important;">
+                        <div class="row">
+                            <div class="col-3"></div>
+                            <div class="col-3"></div>
+                            <div class="col-1"></div>
+                            <div class="col-5">
+                                Date: <span t-field="doc.create_date"/>
+                            </div>
+                        </div>
+
+                        <div class="oe_structure"/>
+
+                        <div class="text-center">
+                            <h4>
+
+                            </h4>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-4">
+                                <b>Patient ID:</b> <span t-field="doc.patient_name.patient_id"/>
+                            </div>
+                            <div class="col-5">
+                                <b>Name:</b> <span t-field="doc.patient_name.name"/>
+                            </div>
+                            <div class="col-2">
+                                <b>Age:</b> <span t-field="doc.patient_name.age"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-5">
+                                <b>Address:</b><span t-field="doc.patient_name.address"/>
+                            </div>
+                            <div class="col-3">
+                                <b>Sex:</b> <span t-field="doc.patient_name.sex"/>
+                            </div>
+                            <div class="col-4">
+                                <b>Mobile:</b> <span t-field="doc.mobile"/>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <b>Referred By:</b><span t-field="doc.ref_doctors"/>
+                            </div>
+                            <t t-if="doc.referral">
+                                <div class="col-6">
+                                    <b>Referral:</b><span t-field="doc.referral"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="row">
+                            <t t-if="doc.discount_remarks">
+                                <div class="col-12">
+                                    <b>Discount Remarks: </b><span t-field="doc.discount_remarks"/>
+                                </div>
+                            </t>
+                        </div>
+
+                        <hr/>
+                        <table class="table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>S.N.</th>
+                                    <th>Item Name</th>
+                                    <th>Price</th>
+                                    <th>Amount</th>
+                                    <th>Delivery</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bill_register_tbody">
+                                <t t-set="i" t-value="1"/>
+                                <t t-foreach="doc.bill_register_line_id" t-as="line">
+                                    <tr>
+                                        <td>
+                                            <span t-esc="i"/>
+                                            <t t-set="i" t-value="i + 1"/>
+                                        </td>
+                                        <td><span t-field="line.name"/></td>
+                                        <td><span t-field="line.price"/></td>
+                                        <td><span t-field="line.total_amount"/></td>
+                                        <td><span t-field="line.delivery_date"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <div class="row">
+                            <div class="col-5 text-center">
+                                <p><strong>Payment Details</strong></p>
+                                <t t-foreach="request.env['leih.money.receipt'].search([('bill_id', '=', doc.name)])" t-as="obj">
+                                    <div>
+                                        <span t-if="obj.p_type=='advance'">Advance: <t t-esc="obj.amount"/></span>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <span t-if="obj.p_type=='due_payment'"><t t-esc="obj.date"/></span>
+                                            </div>
+                                            <div class="col-6">
+                                                <span t-if="obj.p_type=='due_payment'"> : <t t-esc="obj.amount"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <div class="col-7 text-right">
+                                <div><strong>Sub Total:</strong> <span t-field="doc.total_without_discount"/></div>
+                                <div><strong>Referral Discount(%):</strong> <span t-field="doc.doctors_discounts"/></div>
+                                <div><strong>Others Discount:</strong> <span t-field="doc.other_discount"/></div>
+                                <div><strong>Grand Total:</strong> <span t-field="doc.grand_total"/></div>
+
+                                <t t-if="doc.advance_paid(doc.name)['paid'] == 0">
+                                    <div><strong>Paid:</strong> <span t-esc="doc.advance_paid(doc.name)['advance']"/></div>
+                                </t>
+                                <t t-if="doc.advance_paid(doc.name)['paid'] > 0">
+                                    <div><strong>Advance:</strong> <span t-esc="doc.advance_paid(doc.name)['advance']"/></div>
+                                </t>
+                                <t t-if="doc.advance_paid(doc.name)['paid'] > 0">
+                                    <div><strong>Paid:</strong> <span t-esc="doc.advance_paid(doc.name)['paid']"/></div>
+                                </t>
+                                <div><strong>Due Amount:</strong> <span t-field="doc.due"/></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <strong>Paid(In Words):</strong> <span t-esc="doc.amount_to_text(doc.paid, 'BDT')"/><br/>
+                        </div>
+                        <p>Created By: <span t-esc="doc.user_id.name"/></p>
+                    </div>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

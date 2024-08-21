@@ -47,3 +47,7 @@ access_inventory_product_entry_line,inventory.product.entry.line,model_inventory
 access_inventory_requisition,inventory.requisition,model_inventory_requisition,base.group_user,1,1,1,1
 access_inventory_requisition_line,inventory.requisition.line,model_inventory_requisition_line,base.group_user,1,1,1,1
 
+access_leih_money_receipt,leih.money.receipt,model_leih_money_receipt,base.group_user,1,1,1,1
+access_bill_register_payment,bill.register.payment,model_bill_register_payment,base.group_user,1,1,1,1
+access_admission_payment,admission.payment,model_admission_payment,base.group_user,1,1,1,1
+

@@ -21,3 +21,6 @@ from . import payment_type
 from . import leih_admission
 from . import inventory_product_entry
 from . import inventory_requisition
+from . import money_receipt
+from . import bill_register_payment
+from . import admission_payment

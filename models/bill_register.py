@@ -485,38 +485,32 @@ class BillRegister(models.Model):
 
         return True
 
-    def btn_pay_bill(self, cr, uid, ids, context=None):
-        if not ids: return []
-        inv = self.browse(cr, uid, ids[0], context=context)
+
+    def btn_pay_bill(self):
+        self.ensure_one()  # Ensure that only one record is being processed
+        inv = self
+
         if inv.state == 'pending':
-            raise UserError(_('Warning'), _('Please Confirm and Print the Bill'))
+            raise UserError(_('Please Confirm and Print the Bill'))
+
         if inv.total <= inv.paid:
-            raise UserError(_('Full Paid'), _('Nothing to Pay Here. Already Full Paid'))
+            raise UserError(_('Nothing to Pay Here. Already Full Paid'))
 
-        dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'leih',
-                                                                             'bill_register_payment_form_view')
-        #
+        # Get the view ID
+        view_id = self.env.ref('medical.bill_register_payment_form_view').id
 
-        # total=inv.total
-        # import pdb
-        # pdb.set_trace()
         return {
             'name': _("Pay Invoice"),
             'view_mode': 'form',
             'view_id': view_id,
-            'view_type': 'form',
             'res_model': 'bill.register.payment',
             'type': 'ir.actions.act_window',
-            'nodestroy': True,
             'target': 'new',
-            'domain': '[]',
             'context': {
-                'default_bill_id': ids[0],
+                'default_bill_id': inv.id,
                 'default_amount': inv.due
             }
         }
-        raise UserError(_('Error!'), _('There is no default company for the current user!'))
-
     def add_discount(self, cr, uid, ids, context=None):
         # import pdb
         # pdb.set_trace()

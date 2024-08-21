@@ -41,10 +41,21 @@
         'views/sticker_view.xml',
         'views/payment_type_view.xml',
         'views/leih_admission_view.xml',
+        'views/leih_admission_activated_view.xml',
+        'views/leih_admission_cancelled_view.xml',
         'views/inventory_product_entry_view.xml',
         'views/inventory_product_entry_verified_view.xml',
         'views/inventory_product_entry_confirmed_view.xml',
         'views/inventory_requisition_view.xml',
+        'views/money_receipt_view.xml',
+        'views/bill_register_payment_view.xml',
+        'views/admission_payment_view.xml',
+        
+
+        'report/action_report_menu.xml',
+        'report/report_bill_register.xml',
+        'report/report_opd_ticket.xml',
+
     ],
     # 'images': ['static/description/banner.gif'],
     'application': True,
