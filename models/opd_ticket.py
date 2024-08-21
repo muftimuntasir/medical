@@ -45,27 +45,28 @@ class OPDTicket(models.Model):
                     # pdb.set_trace()
         return Percentance_calculation
 
-    def opd_cancel(self, cr, uid, ids, context=None):
-        cr.execute(
-            "select id as jounral_id from account_move where ref = (select name from opd_ticket where id=%s limit 1)",
-            (ids))
-        joural_ids = cr.fetchall()
-        context = context
-
-        itm = [itm[0] for itm in joural_ids]
-        if len(itm) > 0:
-            uid = 1
-            moves = self.env['account.move'].browse(cr, uid, itm, context=context)
-            moves.button_cancel()  ## Cancelling
-            moves.unlink()  ### Deleting Journal
-
-        #### Ends Here
-
-        ## Bill Status Will Change
-
-        cr.execute("update opd_ticket set state='cancelled' where id=%s", (ids))
-        cr.commit()
-        return "C"
+    def opd_cancel(self):
+        return True
+        # cr.execute(
+        #     "select id as jounral_id from account_move where ref = (select name from opd_ticket where id=%s limit 1)",
+        #     (ids))
+        # joural_ids = cr.fetchall()
+        # context = context
+        #
+        # itm = [itm[0] for itm in joural_ids]
+        # if len(itm) > 0:
+        #     uid = 1
+        #     moves = self.env['account.move'].browse(cr, uid, itm, context=context)
+        #     moves.button_cancel()  ## Cancelling
+        #     moves.unlink()  ### Deleting Journal
+        #
+        # #### Ends Here
+        #
+        # ## Bill Status Will Change
+        #
+        # cr.execute("update opd_ticket set state='cancelled' where id=%s", (ids))
+        # cr.commit()
+        # return "C"
 
     @api.onchange('patient_name')
     def onchange_patient(self):

@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="action_report_bill_register" model="ir.actions.report">
+        <record id="action_report_leih_bill_register" model="ir.actions.report">
             <field name="name">Print Bill</field>
             <field name="model">bill.register</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">medical.report_bill_register</field>
-            <field name="print_report_name">"Bill-" + object.name</field>
+            <field name="print_report_name">object.name</field>
             <field name="binding_model_id" ref="model_bill_register"/>
         </record>
 
-                <record id="action_report_leih_opd" model="ir.actions.report">
+        <record id="action_report_leih_opd" model="ir.actions.report">
             <field name="name">Print Ticket</field>
             <field name="model">opd.ticket</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">medical.report_opd_ticket</field>
-            <field name="print_report_name">"OPD-" + object.name</field>
+            <field name="print_report_name">object.name</field>
             <field name="binding_model_id" ref="model_opd_ticket"/>
         </record>
 
 
-<record id="action_report_leih_admission" model="ir.actions.report">
-            <field name="name">Admission  Report</field>
+        <record id="action_report_leih_admission" model="ir.actions.report">
+            <field name="name">Admission Report</field>
             <field name="model">leih.admission</field>
             <field name="report_type">qweb-pdf</field>
             <field name="report_name">medical.report_leih_admission</field>
