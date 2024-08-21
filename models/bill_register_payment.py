@@ -20,7 +20,7 @@ class BillRegisterPayment(models.Model):
     def _default_payment_type(self):
         return self.env['payment.type'].search([('name', '=', 'Cash')], limit=1).id
 
-    def _creation_of_bill_register_line(self):
+    def _creation_of_money_receipt(self):
 
         payment_obj = self
         bill_id = payment_obj.bill_id.id
@@ -120,7 +120,7 @@ class BillRegisterPayment(models.Model):
         current_paid = payment_obj.bill_id.paid
         updated_amount = max(current_due - pay_amount, 0)
         updated_paid = current_paid + pay_amount
-        self._creation_of_bill_register_line()
+        self._creation_of_money_receipt()
 
         return self.env.cr.execute("UPDATE bill_register SET due=%s, paid=%s WHERE id=%s", (updated_amount, updated_paid, payment_obj.bill_id.id))
 
