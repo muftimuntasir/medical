@@ -20,7 +20,8 @@ class BillRegisterPayment(models.Model):
     def _default_payment_type(self):
         return self.env['payment.type'].search([('name', '=', 'Cash')], limit=1).id
 
-    def button_add_payment_action(self):
+    def _creation_of_bill_register_line(self):
+
         payment_obj = self
         bill_id = payment_obj.bill_id.id
         bill_register_id = payment_obj.bill_id.name
@@ -43,11 +44,13 @@ class BillRegisterPayment(models.Model):
             'bill_register_payment_line_id': bill_id,
             'money_receipt_id': money_receipt_id
         }
+        return self.env['bill.register.payment.line'].create(service_dict)
 
-        self.env['bill.register.payment.line'].create(service_dict)
-
-        self.env.cr.execute("UPDATE bill_register SET due=%s, paid=%s WHERE id=%s", (updated_amount, updated_paid, bill_id))
-
+    def _create_journal_entry(self):
+        payment_obj =self
+        bill_register_id = payment_obj.bill_id.name
+        current_paid = payment_obj.bill_id.paid
+        pay_amount = payment_obj.amount
         journal_object = self.env["bill.journal.relation"]
         line_ids = []
 
@@ -108,24 +111,38 @@ class BillRegisterPayment(models.Model):
             move.action_post()
             journal_object.create({'journal_id': move.id, 'bill_journal_relation_id': bill_id})
 
+        return True
+
+    def button_add_payment_action(self):
+        payment_obj = self
+        pay_amount = payment_obj.amount
+        current_due = payment_obj.bill_id.due
+        current_paid = payment_obj.bill_id.paid
+        updated_amount = max(current_due - pay_amount, 0)
+        updated_paid = current_paid + pay_amount
+        self._creation_of_bill_register_line()
+
+        return self.env.cr.execute("UPDATE bill_register SET due=%s, paid=%s WHERE id=%s", (updated_amount, updated_paid, payment_obj.bill_id.id))
+
+
     @api.model
     def create(self, vals):
         stored_payment = super(BillRegisterPayment, self).create(vals)
 
-        if stored_payment:
-            name_text = f'CC-100{stored_payment.id}'
-            stored_payment.name = name_text
+        import pdb
+        pdb.set_trace()
 
-            bill = self.env['bill.register'].browse(vals['bill_id'])
-            diagonostic_bill = bill.diagonostic_bill
+        if stored_payment:
+            name_text = f'CC-200{stored_payment.id}'
+            stored_payment.name = name_text
 
             money_receipt_vals = {
                 'date': vals['date'],
-                'bill_id': vals['bill_id'],
+                'bill_id': stored_payment.bill_id.id,
                 'amount': vals['amount'],
                 'type': vals['payment_type'],
                 'p_type': 'due_payment',
-                'diagonostic_bill': diagonostic_bill,
+                'diagonostic_bill': stored_payment.bill_id.diagonostic_bill
             }
             mr_id = self.env['leih.money.receipt'].create(money_receipt_vals)
             if mr_id:
