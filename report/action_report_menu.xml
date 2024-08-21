@@ -10,7 +10,7 @@
             <field name="binding_model_id" ref="model_bill_register"/>
         </record>
 
-                <record id="action_report_opd_layout" model="ir.actions.report">
+                <record id="action_report_leih_opd" model="ir.actions.report">
             <field name="name">Print Ticket</field>
             <field name="model">opd.ticket</field>
             <field name="report_type">qweb-pdf</field>
@@ -20,7 +20,13 @@
         </record>
 
 
-
+<record id="action_report_leih_admission" model="ir.actions.report">
+            <field name="name">Admission  Report</field>
+            <field name="model">leih.admission</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">medical.report_leih_admission</field>
+            <field name="print_report_name">'Admission - %s' % (object.name)</field>
+        </record>
 
     </data>
 </odoo>

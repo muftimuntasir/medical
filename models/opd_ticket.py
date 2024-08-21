@@ -26,6 +26,9 @@ class OPDTicket(models.Model):
     total = fields.Float(string="Total")
     with_doctor_total = fields.Float(string="With Doctor Total")
 
+    def print_opd_ticket(self):
+        return self.env.ref('medical.action_report_leih_opd').report_action(self)
+
     def _totalpayable(self, cr, uid, ids, field_name, arg, context=None):
         Percentance_calculation = {}
         sum = 0

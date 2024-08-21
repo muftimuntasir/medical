@@ -55,6 +55,7 @@
         'report/action_report_menu.xml',
         'report/report_bill_register.xml',
         'report/report_opd_ticket.xml',
+        'report/report_leih_admission.xml',
 
     ],
     # 'images': ['static/description/banner.gif'],

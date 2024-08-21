@@ -130,49 +130,7 @@ class LeihAdmission(models.Model):
         journal_obj = self.env['bill.journal.relation']
         if self.state == 'activated':
             raise UserError(_('Already this Bill is Confirmed.'))
-
-        get_all_tested_ids = self.leih_admission_line_id.mapped('name.id')
-        already_merged = []
-
-        for item in self.leih_admission_line_id:
-            custom_name = item.name.name
-            state = 'sample' if not item.name.sample_req else 'lab'
-            if item.name.indoor:
-                state = 'indoor'
-
-            if not (item.name.manual or item.name.lab_not_required):
-                value = {
-                    'admission_id': self.id,
-                    'test_id': item.name.id,
-                    'department_id': item.name.department.id,
-                    'state': state,
-                    'sticker_line_id': [(0, 0, {
-                        'test_name': line.name,
-                        'ref_value': line.reference_value,
-                        'bold': line.bold,
-                        'group_by': line.group_by
-                    }) for line in item.name.examination_entry_line],
-                    'full_name': custom_name
-                }
-
-                if item.name.merge:
-                    for entry in item.name.merge_ids:
-                        test_id = entry.examinationentry_id.id
-                        if test_id in get_all_tested_ids:
-                            already_merged.append(test_id)
-                            value['full_name'] += ', ' + entry.examinationentry_id.name
-                            value['sticker_line_id'] += [(0, 0, {
-                                'test_name': line.name,
-                                'ref_value': line.reference_value,
-                                'bold': line.bold,
-                                'group_by': line.group_by
-                            }) for line in entry.examinationentry_id.examination_entry_line]
-
-                sample_obj = self.env['diagnosis.sticker'].create(value)
-                sample_obj.name = 'Lab-0' + str(sample_obj.id)
-
         # Journal Entry Creation
-        period = self.env['account.period'].find(self.date)[:1]
         has_been_paid = 0
         account_id = self.payment_type.account.id if self.payment_type.name == 'Visa Card' else 6
 
@@ -236,7 +194,7 @@ class LeihAdmission(models.Model):
                 'money_receipt_id': mr.id,
             })
 
-        return self.env.ref('leih.report_admission').report_action(self)
+        return self.env.ref('medical.action_report_leih_admission').report_action(self)
 
     def admission_cancel(self):
         # Unlink journal entries

@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_leih_admission">
+            <t t-call="web.external_layout">
+<!--                <t t-call="report.external_layout">-->
+                    <t t-foreach="docs" t-as="o">
+                        <div class="page" style="font-size: 16px !important;">
+                            <div class="row">
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-3"></div>
+                                <div class="col-xs-1"></div>
+                                <div class="col-xs-5">
+                                    Date: <span t-field="o.date" t-field-options='{"format": "dd/MM/yyyy"}'/>
+                                </div>
+                            </div>
+
+                            <div class="oe_structure"/>
+                            <div class="row">
+                                <div style="col-md-6 align:left">
+                                    <h3>
+                                        <b>Admission ID: </b><span t-field="o.name"/>
+                                    </h3>
+                                </div>
+                                <t t-if="o.operation_date">
+                                <div style="col-md-6 align:left">
+                                    <h5>
+                                        <b>Expected Operation Date: </b><span t-field="o.operation_date"/>
+                                    </h5>
+                                </div>
+                                </t>
+
+                                <div class="col-md-6 pull-right">
+                                    <h3>
+                                        <img t-att-src="'/report/barcode/?type=%s&amp;value=%s&amp;width=%s&amp;height=%s' % ('Code128', o.name, 600, 100)" style="width:300px;height:50px"/>
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <b>Patient ID:</b>
+                                    <span t-field="o.patient_name.patient_id"/>
+                                </div>
+                                <div class="col-xs-5">
+                                    <b>Name: </b> <span t-field="o.patient_name.name"/>
+<!--                                    <p t-field="o.patient_name"/>-->
+                                </div>
+                                <div class="col-xs-2">
+                                    <b>Age:</b>
+                                    <span t-field="o.age"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <strong>Address:</strong>
+                                    <span t-field="o.address"/>
+                                </div>
+                                    <div class="col-xs-3">
+                                    <strong>Sex:</strong>
+                                    <span t-field="o.sex"/>
+                                </div>
+                                <div class="col-xs-4">
+                                    <strong>Mobile:</strong>
+                                    <span t-field="o.mobile"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <strong>Reffered By:</strong>
+                                    <span t-field="o.ref_doctors"/>
+                                </div>
+                                <t t-if="o.reffered_to_hospital">
+                                    <div class="col-xs-6">
+                                        <b>Referral:</b><span t-field="o.reffered_to_hospital"/>
+                                    </div>
+                                </t>
+                            </div>
+                            <div class="row">
+                                <t t-if="o.discount_remarks">
+                                    <div class="col-xs-12">
+                                        <b>Discount Remarks: </b><span t-field="o.discount_remarks"/>
+                                    </div>
+                                </t>
+                            </div>
+
+                                 <t t-set="i" t-value="1" />
+                                    <t t-foreach="o.guarantor_line_id" t-as="z">
+                                        <div class="col-xs-4">
+                                            <strong>Guarantor Name:</strong>
+                                            <span t-field="z.name"/>
+                                        </div>
+                                        <div class="col-xs-4">
+                                            <strong>Contact:</strong>
+                                            <span t-field="z.contact"/>
+                                        </div>
+                                    </t>
+                            <hr/>
+
+                            <table class="table table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>S.N</th>
+                                        <th>Operation Name</th>
+                                        <th>Price</th>
+<!--                                        <th>Package Name</th>-->
+                                        <th>Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bill_register_tbody">
+                                    <t t-set="i" t-value="1" />
+                                    <t t-foreach="o.leih_admission_line_id" t-as="z">
+                                        <tr>
+                                            <td>
+                                                <span t-esc="i"/>
+                                                <t t-set="i" t-value="i+1"/>
+                                            </td>
+                                            <td>
+                                                <span t-field="z.name"/>
+
+                                            </td>
+
+                                            <td>
+                                                <span t-field="z.price"/>
+
+                                            </td>
+<!--                                            <td>-->
+<!--                                                <span t-field="z.name"/>-->
+
+<!--                                            </td>-->
+                                            <td>
+                                                <span t-field="z.total_amount"/>
+
+                                            </td>
+
+                                        </tr>
+
+                                    </t>
+
+                                </tbody>
+
+                            </table>
+
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <p style="align:center"><strong>Payment Details</strong></p>
+                                    <t t-foreach="request.env['leih.money.receipt'].search([('admission_id', '=', o.name)])" t-as="obj">
+                                                             <div>
+
+                                                                 <span t-if="obj.p_type=='advance'">Advance: <t t-esc="obj.amount" /></span>
+                                                                 <div class="row">
+                                                                     <div class="col-xs-5">
+                                                                         <span t-if="obj.p_type=='due_payment'"><t t-esc="obj.date"/></span>
+                                                                     </div>
+                                                                     <div class="col-xs-7">
+                                                                 <span t-if="obj.p_type=='due_payment'"> : <t t-esc="obj.amount"/></span>
+                                                                         </div>
+                                                                     </div>
+                                </div>
+
+                        </t>
+                                </div>
+                                <div class="col-xs-7 pull-left">
+                            <div align="center" style="mergin-right:15px;">
+                                    <strong>Sub Total:</strong>
+                                    <span t-field="o.total"/>
+                                </div>
+                            <div align="center" style="mergin-right:15px;">
+                                    <strong>Others Discount:</strong>
+                                    <span t-field="o.other_discount"/>
+                                </div>
+                                 <div align="center" style="mergin-right:15px;">
+                                    <strong>Grand Total:</strong>
+                                    <span t-field="o.grand_total"/>
+                                </div>
+<!--                                    new section for advance and paid-->
+                                    <t t-if="o.advance_paid(o.name)['paid']==0">
+                                <div align="center" style="mergin-right:25px;">
+                                    <strong>Paid:</strong>
+                                   <span t-esc="o.advance_paid(o.name)['advance']"/>
+                                </div>
+                                </t>
+                                <t t-if="o.advance_paid(o.name)['paid']>0">
+                                <div align="center" style="mergin-right:25px;">
+                                    <strong>Advance:</strong>
+                                   <span t-esc="o.advance_paid(o.name)['advance']"/>
+                                </div>
+                                </t>
+
+                                <t t-if="o.advance_paid(o.name)['paid']>0">
+                                 <div align="center" style="mergin-right:25px;">
+                                    <strong>Paid:</strong> <span t-esc="o.advance_paid(o.name)['paid']"/>
+                                     </div>
+                                </t>
+<!--                                    end-->
+<!--                                 <div align="center" style="mergin-right:15px;">-->
+<!--                                    <strong>Paid Amount:</strong>-->
+<!--                                    <span t-field="o.paid"/>-->
+<!--                                </div>-->
+                                 <div align="center" style="mergin-right:15px;">
+                                    <strong>Due:</strong>
+                                    <span t-field="o.due"/>
+                                </div>
+                                </div>
+                                </div>
+                         <div>
+                            <strong>Paid (In Words): </strong>
+                            <span t-esc="o.amount_to_text(o.paid, 'BDT')"/><br/>
+                        </div>
+
+
+                        <p>Created By:  <span t-esc="o.user_id.name"/></p>
+
+
+
+                        </div>
+
+
+
+
+
+                    </t>
+                </t>
+<!--            </t>-->
+        </template>
+    </data>
+</odoo>
