@@ -132,7 +132,7 @@
                         </div>
 
                         <div>
-                            <strong>Paid(In Words):</strong> <span t-esc="doc.amount_to_text(doc.paid, 'BDT')"/><br/>
+                            <strong>Paid(In Words):</strong> Amount To Text<br/>
                         </div>
                         <p>Created By: <span t-esc="doc.user_id.name"/></p>
                     </div>

@@ -5,6 +5,8 @@ class OPDTicket(models.Model):
     _name = "opd.ticket"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = "OPD Ticket"
+    _order = 'id desc'
+
 
     name = fields.Char(string="OPD Number")
     mobile = fields.Char(string="Mobile")

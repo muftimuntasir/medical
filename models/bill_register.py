@@ -48,13 +48,13 @@ class BillRegister(models.Model):
 
         # 'patient_id': fields.Char("Patient ID"),
     name= fields.Char("Name")
-    mobile= fields.Char(string="Mobile", store=False)
+    mobile= fields.Char(string="Mobile")
     patient_id= fields.Char(related='patient_name.patient_id', string="Patient Id", readonly=True)
     patient_name= fields.Many2one('patient.info', "Patient Name", required=True)
-    address= fields.Char("Address", store=False)
-    age= fields.Char("Age", store=False)
-    sex= fields.Char("Sex", store=False)
-    diagonostic_bill= fields.Boolean("Diagonstic Bill")
+    address= fields.Char("Address")
+    age= fields.Char("Age")
+    sex= fields.Char("Sex")
+    diagonostic_bill= fields.Boolean("Diagnostic Bill")
     ref_doctors= fields.Many2one('doctors.profile', 'Referred by')
     referral= fields.Many2one('brokers.info', 'Referral')
     bill_register_line_id= fields.One2many('bill.register.line', 'bill_register_id', 'Item Entry', required=True)
@@ -68,7 +68,7 @@ class BillRegister(models.Model):
     other_discount= fields.Float("Other Discount")
     grand_total= fields.Float("Grand Total")
     paid= fields.Float(string="Paid", required=True)
-    type= fields.Selection([('cash', 'Cash'), ('bank', 'Bank')], 'Payment Type'),
+    type= fields.Selection([('cash', 'Cash'), ('bank', 'Bank')], 'Payment Type')
     card_no= fields.Char('Card No.')
     bank_name= fields.Char('Bank Name')
     due= fields.Float("Due")
@@ -76,8 +76,8 @@ class BillRegister(models.Model):
     user_id= fields.Many2one('res.users', 'Assigned to', select=True, track_visibility='onchange')
     state= fields.Selection(
         [('pending', 'Pending'), ('confirmed', 'Confirmed'), ('cancelled', 'Cancelled')],
-        'Status', default='pending', readonly=True),
-    old_journal= fields.Boolean("Old Journal"),
+        'Status', default='pending')
+    old_journal= fields.Boolean("Old Journal")
     # new attributes for payment type
     payment_type= fields.Many2one("payment.type", "Payment Type", default=_default_payment_type)
     service_charge= fields.Float("Service Charge")
@@ -153,9 +153,16 @@ class BillRegister(models.Model):
     #                 raise ValidationError(_('Item should be one per line.'))
     #             exist_item_list.append(line.name.id)
 
-    def bill_confirm(self, cr, uid, ids, context=None):
 
-        stored_obj = self.browse(cr, uid, [ids[0]], context=context)
+    def _crerate_journal(self):
+        return True
+
+    def _create_labs_data(self):
+        return True
+
+    def bill_confirm(self):
+
+        stored_obj = self
         journal_object = self.pool.get("bill.journal.relation")
 
         diagonostic_bill = stored_obj.diagonostic_bill
@@ -171,230 +178,16 @@ class BillRegister(models.Model):
             percent_amount = (paid_amount * 100) / grand_total
         if grand_total == 0:
             percent_amount = 0
+
+
+
         if percent_amount >= 0 or grand_total == 0:
+            self.state = "confirmed"
 
-            stored = int(ids[0])
+            report_action = self.env.ref('medical.action_report_leih_bill_register')
+            return report_action.report_action(self)
 
-            ### check and merged with Lab report
-
-            get_all_tested_ids = []
-
-            for items in stored_obj.bill_register_line_id:
-                get_all_tested_ids.append(items.name.id)
-
-            ### Ends here merged Section
-
-            already_merged = []
-            custom_name = ''
-            for items in stored_obj.bill_register_line_id:
-                custom_name = ''
-                state = 'sample'
-                ### Create LAB/SAMPLE From Here
-                if items.name.sample_req == False or items.name.sample_req == None:
-                    state = 'lab'
-
-                if items.name.manual != True or items.name.lab_not_required != True:
-
-                    custom_name = custom_name + ' ' + str(items.name.name)
-                    if items.name.id not in already_merged:
-
-                        child_list = []
-                        value = {
-                            'bill_register_id': int(stored),
-                            'test_id': int(items.name.id),
-                            'department_id': items.name.department.name,
-                            'state': state
-                        }
-
-                        for test_item in items.name.examination_entry_line:
-                            tmp_dict = {}
-                            tmp_dict['test_name'] = test_item.name
-                            tmp_dict['ref_value'] = test_item.reference_value
-                            tmp_dict['bold'] = test_item.bold
-                            tmp_dict['group_by'] = test_item.group_by
-                            child_list.append([0, False, tmp_dict])
-
-                        if items.name.merge == True:
-
-                            for entry in items.name.merge_ids:
-                                test_id = entry.examinationentry_id.id
-
-                                if test_id in get_all_tested_ids:
-                                    custom_name = custom_name + ', ' + str(entry.examinationentry_id.name)
-                                    already_merged.append(test_id)
-                                    for m_test_line in entry.examinationentry_id.examination_entry_line:
-                                        tmp_dict = {}
-                                        tmp_dict['test_name'] = m_test_line.name
-                                        tmp_dict['ref_value'] = m_test_line.reference_value
-                                        tmp_dict['bold'] = m_test_line.bold
-                                        tmp_dict['group_by'] = m_test_line.group_by
-                                        child_list.append([0, False, tmp_dict])
-
-                        value['sticker_line_id'] = child_list
-
-                        value['full_name'] = custom_name
-
-                        sample_obj = self.pool.get('diagnosis.sticker')
-                        sample_id = sample_obj.create(cr, uid, value, context=context)
-
-                    ### Ends Here LAB/SAMPLE From Here
-
-                    if sample_id is not None:
-                        sample_text = 'Lab-0' + str(sample_id)
-                        cr.execute('update diagnosis_sticker set name=%s where id=%s', (sample_text, sample_id))
-                        cr.commit()
-
-            # import pdb
-            # pdb.set_trace()
-
-            has_been_paid = 0
-
-            ### Journal ENtry will be here
-
-            if stored_obj:
-                line_ids = []
-
-                if context is None: context = {}
-                if context.get('period_id', False):
-                    return context.get('period_id')
-                periods = self.pool.get('account.period').find(cr, uid, context=context)
-                period_id = periods and periods[0] or False
-                # if method is cash
-                if stored_obj.payment_type:
-                    has_been_paid = stored_obj.paid
-                    ar_amount = stored_obj.due
-                    account_id = stored_obj.payment_type.account.id
-                # elif stored_obj.payment_type.name == 'Visa Card':
-                #     has_been_paid = stored_obj.to_be_paid
-                #     ar_amount = stored_obj.due
-                #     account_id = stored_obj.payment_type.account.id
-
-                if ar_amount > 0:
-                    line_ids.append((0, 0, {
-                        'analytic_account_id': False,
-                        'tax_code_id': False,
-                        'tax_amount': 0,
-                        'name': stored_obj.name,
-                        'currency_id': False,
-                        'credit': 0,
-                        'date_maturity': False,
-                        'account_id': 195,  ### Accounts Receivable ID
-                        'debit': ar_amount,
-                        'amount_currency': 0,
-                        'partner_id': False,
-                    }))
-
-                if has_been_paid > 0:
-                    line_ids.append((0, 0, {
-                        'analytic_account_id': False,
-                        'tax_code_id': False,
-                        'tax_amount': 0,
-                        'name': stored_obj.name,
-                        'currency_id': False,
-                        'credit': 0,
-                        'date_maturity': False,
-                        'account_id': account_id,  ### Cash/Bank ID
-                        'debit': has_been_paid,
-                        'amount_currency': 0,
-                        'partner_id': False,
-                    }))
-
-                for cc_obj in stored_obj.bill_register_line_id:
-                    ledger_id = 611
-                    try:
-                        ledger_id = cc_obj.name.accounts_id.id
-                    except:
-                        ledger_id = 611  ## Diagnostic Income Head , If we don't assign any Ledger
-
-                    if context is None:
-                        context = {}
-
-                    line_ids.append((0, 0, {
-                        'analytic_account_id': False,
-                        'tax_code_id': False,
-                        'tax_amount': 0,
-                        'name': cc_obj.name.name,
-                        'currency_id': False,
-                        'account_id': cc_obj.name.accounts_id.id,
-                        'credit': cc_obj.total_amount,
-                        'date_maturity': False,
-                        'debit': 0,
-                        'amount_currency': 0,
-                        'partner_id': False,
-                    }))
-                    # end cash statement
-
-                    # if payment type is card
-
-                if stored_obj.service_charge > 0:
-                    line_ids.append((0, 0, {
-                        'analytic_account_id': False,
-                        'tax_code_id': False,
-                        'tax_amount': 0,
-                        'name': stored_obj.payment_type.name,
-                        'currency_id': False,
-                        'credit': stored_obj.service_charge,
-                        'date_maturity': False,
-                        'account_id': stored_obj.payment_type.service_charge_account.id,  ### Cash ID
-                        'debit': 0,
-                        'amount_currency': 0,
-                        'partner_id': False,
-                    }))
-
-                    # end of card payment
-
-                jv_entry = self.pool.get('account.move')
-
-                j_vals = {'name': '/',
-                          'journal_id': 2,  ## Sales Journal
-                          'date': stored_obj.date,
-                          'period_id': period_id,
-                          'ref': stored_obj.name,
-                          'line_id': line_ids
-                          }
-
-                saved_jv_id = jv_entry.create(cr, uid, j_vals, context=context)
-                if saved_jv_id > 0:
-                    journal_id = saved_jv_id
-                    try:
-                        jv_entry.button_validate(cr, uid, [saved_jv_id], context)
-                        cr.execute("update bill_register set state='confirmed' where id=%s", (ids))
-                        cr.commit()
-                        journal_dict = {'journal_id': journal_id, 'bill_journal_relation_id': stored_obj.id}
-                        journal_object.create(cr, uid, vals=journal_dict, context=context)
-                        if stored_obj.paid != False:
-                            for bills_vals in stored_obj:
-                                # import pdb
-                                # pdb.set_trace()
-                                mr_value = {
-                                    'date': stored_obj.date,
-                                    'bill_id': int(stored),
-                                    'amount': stored_obj.paid,
-                                    'type': stored_obj.type,
-                                    'p_type': 'advance',
-                                    'bill_total_amount': stored_obj.total,
-                                    'due_amount': stored_obj.due
-                                }
-                            mr_obj = self.pool.get('leih.money.receipt')
-                            mr_id = mr_obj.create(cr, uid, mr_value, context=context)
-
-                            if mr_id is not None:
-                                mr_name = 'MR#' + str(mr_id)
-                                cr.execute('update leih_money_receipt set name=%s,diagonostic_bill=%s where id=%s',
-                                           (mr_name, diagonostic_bill, mr_id))
-                                cr.commit()
-                                bill_payment_obj = self.pool.get('bill.register.payment.line')
-                                service_dict = {'date': stored_obj.date, 'amount': paid_amount,
-                                                'type': stored_obj.payment_type.name,
-                                                'bill_register_payment_line_id': stored,
-                                                'money_receipt_id': mr_id}
-                                bill_payment_id = bill_payment_obj.create(cr, uid, vals=service_dict, context=context)
-                    except:
-                        import pdb
-                        pdb.set_trace()
-                ### Ends the journal Entry Here
-
-            return self.pool['report'].get_action(cr, uid, ids, 'leih.report_bill_register', context=context)
+            # return self.pool['report'].get_action(cr, uid, ids, 'leih.report_bill_register', context=context)
         else:
             raise UserError('PLease Pay minimum amount.')
 
@@ -560,7 +353,7 @@ class BillRegister(models.Model):
 
         # Check if there are mixed departments
         mixed_up = False
-        vals['diagonostic_bill'] = False
+        vals['diagonostic_bill'] = True
 
         intersection_result = list(set(child_ids) & set(get_all_depts))
         if intersection_result and len(intersection_result) == len(get_all_depts):

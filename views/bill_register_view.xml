@@ -13,6 +13,7 @@
 <!--                        <button string="Corporate Discount" type="object" name="btn_corporate_discount" groups="base.group_user"/>-->
                         <button string="Confirm and Print" type="object" name="bill_confirm"/>
                         <button string="Cancel" type="object" name="bill_cancel"/>
+                        <field name="state" widget="statusbar" statusbar_visible="pending,confirmed,cancelled"/>
                     </header>
                     <sheet>
                         <group>
