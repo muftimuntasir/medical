@@ -160,12 +160,47 @@ class BillRegister(models.Model):
     def _create_labs_data(self):
         return True
 
+    def _creation_of_money_receipt(self,vals=None, bill_id=None,diagonostic_bill=False):
+
+        money_receipt_vals = {
+            'date': vals['date'],
+            'bill_id': bill_id,
+            'amount': vals['amount'],
+            'type': vals['payment_type'],
+            'p_type': 'due_payment',
+            'diagonostic_bill': diagonostic_bill
+        }
+
+        return self.env['leih.money.receipt'].create(money_receipt_vals)
+
+    def _create_journal_entry(self, amount=0.0, cr_act_id=1, dr_act_id=1, bill_no="BILL", line_label="MR"):
+        bill_no = bill_no + f'/' + line_label
+        jv_vals = {
+            'ref': bill_no,
+            'journal_id': 2,
+            'date': '2024-08-22',
+            'line_ids': [
+
+                (0, 0, {
+                    'name': line_label,
+                    'account_id': dr_act_id,
+                    'debit': amount,
+                }),
+                (0, 0, {
+                    'name': line_label,
+                    'account_id': cr_act_id,
+                    'credit': amount,
+                })
+            ]
+
+        }
+
+        return self.env['account.move'].create(jv_vals)
+
     def bill_confirm(self):
 
         stored_obj = self
-        journal_object = self.pool.get("bill.journal.relation")
 
-        diagonostic_bill = stored_obj.diagonostic_bill
         ## Bill Status Will Change
 
         # if stored_obj.state == 'confirmed':
@@ -184,9 +219,19 @@ class BillRegister(models.Model):
         if percent_amount >= 0 or grand_total == 0:
             self.state = "confirmed"
 
+            bill_register_line_vals = {'account_number': False,
+             'amount': paid_amount,
+             'date': '2024-08-22',
+             'payment_type': 1,
+             'service_charge': 0,
+             'bill_id':self.id,
+             'to_be_paid': stored_obj.due}
+
             #### Create Journal From Here
 
-            #### Ends Here
+            bill_register_line = self.env['bill.register.payment'].create(bill_register_line_vals)
+            bill_register_line._creation_of_bill_register_payment_line()
+
 
             # report_action = self.env.ref('medical.action_report_leih_bill_register')
             # return report_action.report_action(self)
