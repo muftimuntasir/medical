@@ -83,18 +83,6 @@
                                     </div>
                                 </t>
                             </div>
-
-                                 <t t-set="i" t-value="1" />
-                                    <t t-foreach="o.guarantor_line_id" t-as="z">
-                                        <div class="col-xs-4">
-                                            <strong>Guarantor Name:</strong>
-                                            <span t-field="z.name"/>
-                                        </div>
-                                        <div class="col-xs-4">
-                                            <strong>Contact:</strong>
-                                            <span t-field="z.contact"/>
-                                        </div>
-                                    </t>
                             <hr/>
 
                             <table class="table table-condensed">
@@ -116,7 +104,7 @@
                                                 <t t-set="i" t-value="i+1"/>
                                             </td>
                                             <td>
-                                                <span t-field="z.name"/>
+                                                <span t-field="z.examination_id"/>
 
                                             </td>
 
@@ -203,13 +191,8 @@
                                 </div>
                                 </div>
                                 </div>
-                         <div>
-                            <strong>Paid (In Words): </strong>
-                            <span t-esc="o.amount_to_text(o.paid, 'BDT')"/><br/>
-                        </div>
 
 
-                        <p>Created By:  <span t-esc="o.user_id.name"/></p>
 
 
 

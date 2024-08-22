@@ -109,7 +109,7 @@ class BillRegisterPayment(models.Model):
         move = self.env['account.move'].create(move_vals)
         if move:
             move.action_post()
-            journal_object.create({'journal_id': move.id, 'bill_journal_relation_id': bill_id})
+            journal_object.create({'journal_id': move.id, 'bill_journal_relation_id': bill_register_id})
 
         return True
 

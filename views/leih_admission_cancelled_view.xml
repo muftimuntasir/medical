@@ -12,7 +12,7 @@
                 </field>
         </record>
 
-        <record id="admission_activated_action" model="ir.actions.act_window">
+        <record id="admission_cancelled_action" model="ir.actions.act_window">
             <field name="name">Admission Form</field>
             <field name="res_model">leih.admission</field>
             <field name="type">ir.actions.act_window</field>
@@ -24,7 +24,7 @@
 
 
         <!-- expense type tree -->
-        <record model="ir.ui.view" id="admission_activated_tree" >
+        <record model="ir.ui.view" id="admission_cancelled_tree" >
             <field name="name">leih</field>
             <field name="model">leih.admission</field>
             <field name="arch" type="xml">
@@ -47,7 +47,7 @@
 
 
 <!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
-        <menuitem name="Cancelled Admission" id="admission_cancelled_menu_mainform" parent="leih_admission_menu" action="admission_activated_action"/>
+        <menuitem name="Cancelled Admission" id="admission_cancelled_menu_mainform" parent="leih_admission_menu" action="admission_cancelled_action"/>
 
 
     </data>

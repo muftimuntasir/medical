@@ -131,47 +131,46 @@ class LeihAdmission(models.Model):
         if self.state == 'activated':
             raise UserError(_('Already this Bill is Confirmed.'))
         # Journal Entry Creation
-        has_been_paid = 0
-        account_id = self.payment_type.account.id if self.payment_type.name == 'Visa Card' else 6
-
-        line_ids = []
-        if self.due > 0:
-            line_ids.append((0, 0, {
-                'name': self.name,
-                'account_id': 195,
-                'debit': self.due,
-            }))
-        if has_been_paid > 0:
-            line_ids.append((0, 0, {
-                'name': self.name,
-                'account_id': account_id,
-                'debit': has_been_paid,
-            }))
-        for cc_obj in self.leih_admission_line_id:
-            line_ids.append((0, 0, {
-                'name': cc_obj.name.name,
-                'account_id': cc_obj.name.accounts_id.id,
-                'credit': cc_obj.total_amount,
-            }))
-        if self.service_charge > 0:
-            line_ids.append((0, 0, {
-                'name': self.payment_type.name,
-                'account_id': self.payment_type.service_charge_account.id,
-                'credit': self.service_charge,
-            }))
-
-        move_vals = {
-            'journal_id': 2,
-            'date': self.date,
-            'ref': self.name,
-            'line_ids': line_ids,
-        }
-        move = self.env['account.move'].create(move_vals)
-        move.action_post()
-
+        # has_been_paid = 0
+        # account_id = self.payment_type.account.id if self.payment_type.name == 'Visa Card' else 6
+        #
+        # line_ids = []
+        # if self.due > 0:
+        #     line_ids.append((0, 0, {
+        #         'name': self.name,
+        #         'account_id': 195,
+        #         'debit': self.due,
+        #     }))
+        # if has_been_paid > 0:
+        #     line_ids.append((0, 0, {
+        #         'name': self.name,
+        #         'account_id': account_id,
+        #         'debit': has_been_paid,
+        #     }))
+        # for cc_obj in self.leih_admission_line_id:
+        #     line_ids.append((0, 0, {
+        #         'name': cc_obj.examination_id.name,
+        #         'account_id': cc_obj.examination_id.accounts_id.id,
+        #         'credit': cc_obj.total_amount,
+        #     }))
+        # if self.service_charge > 0:
+        #     line_ids.append((0, 0, {
+        #         'name': self.payment_type.name,
+        #         'account_id': self.payment_type.service_charge_account.id,
+        #         'credit': self.service_charge,
+        #     }))
+        #
+        # move_vals = {
+        #     'journal_id': 2,
+        #     'date': self.date,
+        #     'ref': self.name,
+        #     'line_ids': line_ids,
+        # }
+        # move = self.env['account.move'].create(move_vals)
+        # move.action_post()
+        #
+        # journal_obj.create({'journal_id': move.id, 'admission_journal_relation_id': self.id})
         self.write({'state': 'activated'})
-        journal_obj.create({'journal_id': move.id, 'admission_journal_relation_id': self.id})
-
         # Update money receipt
         if self.paid:
             mr_vals = {
@@ -340,7 +339,7 @@ class LeihAdmission(models.Model):
         if self.total <= self.paid:
             raise UserError(_('Nothing to Pay Here. Already Fully Paid'))
 
-        view = self.env.ref('leih.admission_payment_form_view')
+        view = self.env.ref('medical.admission_payment_form_view')
 
         return {
             'name': _("Pay Invoice"),
