@@ -18,6 +18,7 @@
                             <field name="amount"/>
                             <field name="type"/>
                             <field name="user_id"/>
+                            <field name="journal_id"/>
                             <field name="state"/>
                         </group>
                     </sheet>

@@ -168,8 +168,8 @@ class BillRegister(models.Model):
         diagonostic_bill = stored_obj.diagonostic_bill
         ## Bill Status Will Change
 
-        if stored_obj.state == 'confirmed':
-            raise UserError(_('Already this Bill is Confirmed.'))
+        # if stored_obj.state == 'confirmed':
+        #     raise UserError(_('Already this Bill is Confirmed.'))
 
         # this section is used to minimum payment for bill 35%
         grand_total = stored_obj.grand_total
@@ -184,8 +184,13 @@ class BillRegister(models.Model):
         if percent_amount >= 0 or grand_total == 0:
             self.state = "confirmed"
 
-            report_action = self.env.ref('medical.action_report_leih_bill_register')
-            return report_action.report_action(self)
+            #### Create Journal From Here
+
+            #### Ends Here
+
+            # report_action = self.env.ref('medical.action_report_leih_bill_register')
+            # return report_action.report_action(self)
+            return True
 
             # return self.pool['report'].get_action(cr, uid, ids, 'leih.report_bill_register', context=context)
         else:

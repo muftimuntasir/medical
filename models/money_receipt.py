@@ -24,19 +24,21 @@ class MoneyReceipt(models.Model):
         ('confirm', 'Confirm'),
         ('cancel', 'Cancelled')], string='State', default='confirm')
 
+    journal_id = fields.Many2one("account.move",string="MR Journal")
+
     @api.model
     def create(self, vals):
         res = super(MoneyReceipt, self).create(vals)
 
         # Update Bill Register Paid Value
-        try:
-            paid_amount = 0
-            if 'bill_id' in vals:
-                bill_id = vals.get('bill_id')
-                bill = self.env['bill.register'].browse(bill_id)
-                paid_amount = bill.paid + float(vals.get('amount', 0.0))
-                bill.write({'paid': paid_amount})
-        except Exception as e:
-            raise ValidationError(_("Error updating Bill Register: %s") % str(e))
+        # try:
+        #     paid_amount = 0
+        #     if 'bill_id' in vals:
+        #         bill_id = vals.get('bill_id')
+        #         bill = self.env['bill.register'].browse(bill_id)
+        #         paid_amount = bill.paid + float(vals.get('amount', 0.0))
+        #         bill.write({'paid': paid_amount})
+        # except Exception as e:
+        #     raise ValidationError(_("Error updating Bill Register: %s") % str(e))
 
         return res
