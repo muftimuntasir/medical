@@ -203,8 +203,8 @@ class BillRegister(models.Model):
 
         ## Bill Status Will Change
 
-        # if stored_obj.state == 'confirmed':
-        #     raise UserError(_('Already this Bill is Confirmed.'))
+        if stored_obj.state == 'confirmed':
+            raise UserError(_('Already this Bill is Confirmed.'))
 
         # this section is used to minimum payment for bill 35%
         grand_total = stored_obj.grand_total
