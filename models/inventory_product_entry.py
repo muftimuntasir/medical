@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api,_
 from odoo.exceptions import UserError
 from datetime import date, datetime
 
@@ -7,10 +7,10 @@ class InventoryProductEntry(models.Model):
     _order = 'id desc'
 
     name = fields.Char("Entry No", readonly=True)
-    invoice_no = fields.Char("Invoice/Bill No", required=True)
-    invoice_date = fields.Date("Invoice/Bill Date", required=True)
-    chalan_date = fields.Date("Chalan Date", required=True)
-    chalan_no = fields.Char("Chalan No", required=True)
+    invoice_no = fields.Char("Invoice/Bill No")
+    invoice_date = fields.Date("Invoice/Bill Date")
+    chalan_date = fields.Date("Chalan Date")
+    chalan_no = fields.Char("Chalan No")
     reference_no = fields.Char("Reference No")
     total = fields.Float("Total Amount")
     partner_id = fields.Many2one('res.partner', 'Employee Name', required=True)
@@ -63,62 +63,74 @@ class InventoryProductEntry(models.Model):
             record.write({'state': 'verify', 'advance_journal_id': journal_entry.id})
 
     def confirm_transfer(self):
-        for record in self:
-            if record.state == 'confirmed':
-                raise UserError(_('Sorry, it is already confirmed'))
+        """Transfers products from stock to the customer."""
+        for entry in self:
+            # Check if the state is still 'pending'
+            if entry.state != 'pending':
+                raise UserError(_('Only pending entries can be confirmed.'))
 
-            picking_type = self.env['stock.picking.type'].search([
-                ('warehouse_id', '=', record.warehouse_id.id),
-                ('code', '=', 'incoming')
-            ], limit=1)
-
-            grn_vals = {
-                'partner_id': record.partner_id.id,
-                'date': fields.Datetime.now(),
-                'origin': record.name,
-                'picking_type_id': picking_type.id,
+            # Prepare stock picking values for the transfer
+            picking_vals = {
+                'partner_id': entry.partner_id.id,
+                'location_id': entry.warehouse_id.lot_stock_id.id,  # Source location (stock)
+                'location_dest_id': entry.partner_id.property_stock_customer.id,  # Destination location (customer)
+                'picking_type_id': self.env.ref('stock.picking_type_out').id,  # Delivery Order type
+                'origin': entry.name,
+                'move_ids': [],
             }
 
-            move_lines = [
-                (0, 0, {
-                    'product_id': item.product_name.id,
-                    'product_uom_qty': item.quantity,
-                    'location_id': picking_type.default_location_src_id.id,
-                    'location_dest_id': picking_type.default_location_dest_id.id,
-                    'price_unit': item.unit_price,
-                }) for item in record.inventory_product_entry_line_ids
-            ]
+            move_ids = []
+            for line in entry.inventory_product_entry_line_ids:
+                move_line_vals = {
+                    'name': line.product_name.name,
+                    'product_id': line.product_name.id,
+                    'product_uom_qty': line.quantity,
+                    'product_uom': line.product_name.uom_id.id,
+                    'location_id': entry.warehouse_id.lot_stock_id.id,
+                    'location_dest_id': entry.partner_id.property_stock_customer.id,
+                }
+                move_ids.append((0, 0, move_line_vals))
 
-            grn_vals['move_lines'] = move_lines
-            stock_picking = self.env['stock.picking'].create(grn_vals)
-            stock_picking.action_confirm()
-            stock_picking.button_validate()
+            picking_vals['move_ids'] = move_ids
 
-            journal_entry = self.env['account.move'].create({
-                'journal_id': 6,  # Advance Cash Journal
-                'date': fields.Date.today(),
-                'ref': record.name,
-                'line_ids': [
-                    (0, 0, {
-                        'name': record.name,
-                        'partner_id': record.partner_id.id,
-                        'account_id': item.account_id.id,
-                        'debit': item.total_price,
-                        'credit': 0,
-                    }) for item in record.inventory_product_entry_line_ids
-                ] + [
-                    (0, 0, {
-                        'name': record.name,
-                        'partner_id': record.partner_id.id,
-                        'account_id': record.partner_id.property_account_payable_id.id,
-                        'debit': 0,
-                        'credit': record.total,
-                    })
-                ]
-            })
-            journal_entry.action_post()
+            # Create the stock picking record
+            picking = self.env['stock.picking'].create(picking_vals)
 
-            record.write({'state': 'confirmed', 'grn_id': stock_picking.id, 'grn_journal_id': journal_entry.id})
+            # Confirm and transfer the stock
+            picking.action_confirm()
+            picking.action_assign()
+            picking.button_validate()
+
+            # Update the entry state to 'confirmed'
+            entry.state = 'confirmed'
+
+
+
+            # journal_entry = self.env['account.move'].create({
+            #     'journal_id': 6,  # Advance Cash Journal
+            #     'date': fields.Date.today(),
+            #     'ref': record.name,
+            #     'line_ids': [
+            #         (0, 0, {
+            #             'name': record.name,
+            #             'partner_id': record.partner_id.id,
+            #             'account_id': item.account_id.id,
+            #             'debit': item.total_price,
+            #             'credit': 0,
+            #         }) for item in record.inventory_product_entry_line_ids
+            #     ] + [
+            #         (0, 0, {
+            #             'name': record.name,
+            #             'partner_id': record.partner_id.id,
+            #             'account_id': record.partner_id.property_account_payable_id.id,
+            #             'debit': 0,
+            #             'credit': record.total,
+            #         })
+            #     ]
+            # })
+            # journal_entry.action_post()
+            #
+            # record.write({'state': 'confirmed', 'grn_id': stock_picking.id, 'grn_journal_id': journal_entry.id})
 
     @api.model
     def create(self, vals):
