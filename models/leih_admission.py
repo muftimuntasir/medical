@@ -130,70 +130,35 @@ class LeihAdmission(models.Model):
         journal_obj = self.env['bill.journal.relation']
         if self.state == 'activated':
             raise UserError(_('Already this Bill is Confirmed.'))
-        # Journal Entry Creation
-        # has_been_paid = 0
-        # account_id = self.payment_type.account.id if self.payment_type.name == 'Visa Card' else 6
-        #
-        # line_ids = []
-        # if self.due > 0:
-        #     line_ids.append((0, 0, {
-        #         'name': self.name,
-        #         'account_id': 195,
-        #         'debit': self.due,
-        #     }))
-        # if has_been_paid > 0:
-        #     line_ids.append((0, 0, {
-        #         'name': self.name,
-        #         'account_id': account_id,
-        #         'debit': has_been_paid,
-        #     }))
-        # for cc_obj in self.leih_admission_line_id:
-        #     line_ids.append((0, 0, {
-        #         'name': cc_obj.examination_id.name,
-        #         'account_id': cc_obj.examination_id.accounts_id.id,
-        #         'credit': cc_obj.total_amount,
-        #     }))
-        # if self.service_charge > 0:
-        #     line_ids.append((0, 0, {
-        #         'name': self.payment_type.name,
-        #         'account_id': self.payment_type.service_charge_account.id,
-        #         'credit': self.service_charge,
-        #     }))
-        #
-        # move_vals = {
-        #     'journal_id': 2,
-        #     'date': self.date,
-        #     'ref': self.name,
-        #     'line_ids': line_ids,
-        # }
-        # move = self.env['account.move'].create(move_vals)
-        # move.action_post()
-        #
-        # journal_obj.create({'journal_id': move.id, 'admission_journal_relation_id': self.id})
+       
         self.write({'state': 'activated'})
         # Update money receipt
         if self.paid:
-            mr_vals = {
-                'date': self.date,
-                'admission_id': self.id,
-                'amount': self.paid,
-                'type': self.payment_type.name,
-                'p_type': 'advance',
-                'bill_total_amount': self.total,
-                'due_amount': self.due,
-            }
-            mr = self.env['leih.money.receipt'].create(mr_vals)
-            mr.name = 'MR#' + str(mr.id)
+            vals ={'account_number': False,
+             'amount': self.paid,
+             'date': self.date,
+             'payment_type': 1,
+             'admission_id': self.id,
+             'service_charge': 0,
+             'to_be_paid': self.due}
 
-            self.env['admission.payment.line'].create({
-                'date': self.date,
-                'amount': self.paid,
-                'type': self.payment_type.name,
-                'admission_payment_line_id': self.id,
-                'money_receipt_id': mr.id,
-            })
+            admission_payment_id = self.env['admission.payment'].create(vals)
 
-        return self.env.ref('medical.action_report_leih_admission').report_action(self)
+            mr_id = admission_payment_id._creation_of_money_receipt()
+            if mr_id:
+                mr_id.name = f'MR#{mr_id.id}'
+
+                admission_payment_id.money_receipt_id = mr_id.id
+                admission_payment_id._creation_of_admission_payment_line()
+
+                j_id = admission_payment_id._create_journal_entry(amount=self.paid, cr_act_id=1, dr_act_id=1,
+                                                  bill_no=self.name, line_label=f'MR#{mr_id.id}')
+                self.env.cr.execute("UPDATE leih_money_receipt SET journal_id=%s WHERE id=%s",
+                                    (j_id.id, mr_id.id))
+
+
+        # return self.env.ref('medical.action_report_leih_admission').report_action(self)
+        return True
 
     def admission_cancel(self):
         # Unlink journal entries

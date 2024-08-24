@@ -21,7 +21,7 @@ class AdmissionPayment(models.Model):
     def _default_payment_type(self):
         return self.env['payment.type'].search([('name', '=', 'Cash')], limit=1).id
 
-    def _creation_of_money_receipt(self):
+    def _creation_of_admission_payment_line(self):
         payment_obj = self
         admission_id = payment_obj.admission_id.id
         leih_admission_id = payment_obj.admission_id.name
@@ -44,68 +44,47 @@ class AdmissionPayment(models.Model):
             'admission_payment_line_id': admission_id,
             'money_receipt_id': money_receipt_id
         }
+
+
         return self.env['admission.payment.line'].create(service_dict)
 
-    def _create_journal_entry(self):
-        payment_obj = self
-        admission_id = payment_obj.admission_id.id
-        pay_amount = payment_obj.amount
-        current_paid = payment_obj.admission_id.paid
-        journal_object = self.env['bill.journal.relation']
-        line_ids = []
 
-        periods = self.env['account.period'].find()
-        period_id = periods and periods[0].id or False
+    def _creation_of_money_receipt(self,payment_type='due_payment'):
 
-        if current_paid > 0 and payment_obj.payment_type.name == 'Cash':
-            line_ids.append((0, 0, {
-                'name': admission_id,
-                'account_id': 6,  # Cash ID
-                'debit': pay_amount,
-            }))
-            line_ids.append((0, 0, {
-                'name': admission_id,
-                'account_id': 195,  # Accounts Receivable ID
-                'credit': pay_amount,
-            }))
-
-        if current_paid > 0 and payment_obj.payment_type.name == 'Visa Card':
-            other_method_pay = payment_obj.to_be_paid
-            service_charge = payment_obj.service_charge
-            line_ids.append((0, 0, {
-                'name': admission_id,
-                'account_id': payment_obj.payment_type.account.id,
-                'debit': other_method_pay,
-            }))
-            line_ids.append((0, 0, {
-                'name': admission_id,
-                'account_id': 195,  # Accounts Receivable ID
-                'credit': pay_amount,
-            }))
-            if service_charge > 0:
-                line_ids.append((0, 0, {
-                    'name': admission_id,
-                    'account_id': payment_obj.payment_type.service_charge_account.id,
-                    'credit': service_charge,
-                }))
-
-        jv_entry = self.env['account.move']
-
-        move_vals = {
-            'journal_id': 2,  # Sales Journal
-            'date': fields.Date.today(),
-            'ref': admission_id,
-            'line_ids': line_ids,
+        money_receipt_vals = {
+            'date': self.date,
+            'admission_id': self.admission_id.id,
+            'amount': self.amount,
+            'type': self.payment_type.id,
+            'p_type': payment_type,
+            'diagonostic_bill': False
         }
 
-        move = jv_entry.create(move_vals)
-        if move:
-            move.action_post()
-            journal_object.create({
-                'journal_id': move.id,
-                'admission_journal_relation_id': admission_id
-            })
-        return True
+        return self.env['leih.money.receipt'].create(money_receipt_vals)
+
+    def _create_journal_entry(self,amount=0.0,cr_act_id=1,dr_act_id=1,bill_no="Admission",line_label="MR"):
+        bill_no = bill_no + f'/' + line_label
+        jv_vals = {
+            'ref': bill_no,
+            'journal_id':2,
+            'date':'2024-08-22',
+            'line_ids': [
+
+                (0, 0, {
+                    'name': line_label,
+                    'account_id': dr_act_id,
+                    'debit': amount,
+                }),
+                (0, 0, {
+                    'name': line_label,
+                    'account_id': cr_act_id,
+                    'credit': amount,
+                })
+            ]
+
+        }
+
+        return self.env['account.move'].create(jv_vals)
 
 
     def button_add_payment_action(self):
@@ -115,8 +94,17 @@ class AdmissionPayment(models.Model):
         current_paid = payment_obj.admission_id.paid
         updated_amount = current_due - pay_amount
         updated_paid = current_paid + pay_amount
-        self._creation_of_money_receipt()
+        mr_id = self._creation_of_money_receipt()
 
+        if mr_id:
+            mr_id.name = f'MR#{mr_id.id}'
+
+            self.money_receipt_id = mr_id.id
+            self._creation_of_admission_payment_line()
+
+            j_id = self._create_journal_entry(amount=pay_amount, cr_act_id=1, dr_act_id=1, bill_no=self.admission_id.name, line_label=f'MR#{mr_id.id}')
+            self.env.cr.execute("UPDATE leih_money_receipt SET journal_id=%s WHERE id=%s",
+                                (j_id.id, mr_id.id))
 
         return self.env.cr.execute("update leih_admission set due=%s, paid=%s where id=%s",
                             (updated_amount, updated_paid, payment_obj.admission_id.id))
@@ -129,21 +117,6 @@ class AdmissionPayment(models.Model):
         if stored:
             name_text = 'CC-100' + str(stored.id)
             stored.name = name_text
-
-            # Create a new money receipt
-            value = {
-                'date': vals.get('date'),
-                'admission_id': vals.get('admission_id'),
-                'amount': vals.get('amount'),
-                'type': vals.get('payment_type'),
-                'p_type': 'due_payment',
-            }
-
-            mr_object = self.env['leih.money.receipt']
-            mr_id = mr_object.create(value)
-            if mr_id:
-                mr_id.name = 'MR#' + str(mr_id.id)
-                stored.money_receipt_id = mr_id.id
         return stored
 
     @api.onchange("payment_type")
