@@ -1,6 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import datetime
+from odoo.exceptions import UserError
 
 
 class AdmissionPayment(models.Model):
@@ -112,6 +113,9 @@ class AdmissionPayment(models.Model):
 
     @api.model
     def create(self, vals):
+        if vals.get('amount') > vals.get('to_be_paid'):
+            raise UserError(_('You paid more than the TOTAL AMOUNT'))
+
         stored = super(AdmissionPayment, self).create(vals)  # return ID object
 
         if stored:

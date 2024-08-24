@@ -86,6 +86,10 @@ class BillRegisterPayment(models.Model):
 
     @api.model
     def create(self, vals):
+
+
+        if vals.get('amount') > vals.get('to_be_paid'):
+            raise UserError(_('You paid more than the TOTAL AMOUNT'))
         stored_payment = super(BillRegisterPayment, self).create(vals)
 
         if stored_payment:

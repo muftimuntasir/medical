@@ -130,7 +130,10 @@ class LeihAdmission(models.Model):
         journal_obj = self.env['bill.journal.relation']
         if self.state == 'activated':
             raise UserError(_('Already this Bill is Confirmed.'))
-       
+
+        if self.paid > self.grand_total:
+            raise UserError(_('You paid more than the TOTAL AMOUNT'))
+
         self.write({'state': 'activated'})
         # Update money receipt
         if self.paid:
@@ -202,96 +205,7 @@ class LeihAdmission(models.Model):
         if vals.get("due") and vals.get("due") < 0:
             raise UserError(_("Check paid and grand total!"))
 
-        if vals.get('leih_admission_line_id') or self.env.uid == 1:
-            journal_moves = self.env['account.move'].search([('ref', '=', self.name)])
-            if journal_moves:
-                journal_moves.button_cancel()
-                journal_moves.unlink()
 
-                bill_journal_ids = self.env['bill.journal.relation'].search([('journal_id', 'in', journal_moves.ids)])
-                if bill_journal_ids:
-                    bill_journal_ids.unlink()
-
-                super(LeihAdmission, self).write(vals)
-
-                stored_obj = self.browse(self.ids)
-                journal_object = self.env['bill.journal.relation']
-                has_been_paid = stored_obj.paid
-
-                if stored_obj:
-                    line_ids = []
-
-                    periods = self.env['account.period'].find()
-                    period_id = periods and periods[0] or False
-                    ar_amount = stored_obj.due
-
-                    if ar_amount > 0:
-                        line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
-                            'name': stored_obj.name,
-                            'currency_id': False,
-                            'credit': 0,
-                            'date_maturity': False,
-                            'account_id': 195,  # Accounts Receivable ID
-                            'debit': ar_amount,
-                            'amount_currency': 0,
-                            'partner_id': False,
-                        }))
-
-                    if has_been_paid > 0:
-                        line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
-                            'name': stored_obj.name,
-                            'currency_id': False,
-                            'credit': 0,
-                            'date_maturity': False,
-                            'account_id': 6,  # Cash ID
-                            'debit': has_been_paid,
-                            'amount_currency': 0,
-                            'partner_id': False,
-                        }))
-
-                    for cc_obj in stored_obj.leih_admission_line_id:
-                        ledger_id = cc_obj.name.accounts_id.id if cc_obj.name.accounts_id else 611
-
-                        line_ids.append((0, 0, {
-                            'analytic_account_id': False,
-                            'tax_code_id': False,
-                            'tax_amount': 0,
-                            'name': cc_obj.name.name,
-                            'currency_id': False,
-                            'account_id': ledger_id,
-                            'credit': cc_obj.total_amount,
-                            'date_maturity': False,
-                            'debit': 0,
-                            'amount_currency': 0,
-                            'partner_id': False,
-                        }))
-
-                    jv_entry = self.env['account.move']
-
-                    j_vals = {
-                        'name': '/',
-                        'journal_id': 2,  # Sales Journal
-                        'date': stored_obj.date,
-                        'period_id': period_id.id,
-                        'ref': stored_obj.name,
-                        'line_ids': line_ids,
-                    }
-
-                    saved_jv_id = jv_entry.create(j_vals)
-                    if saved_jv_id:
-                        saved_jv_id.post()
-                        journal_object.create({
-                            'journal_id': saved_jv_id.id,
-                            'admission_journal_relation_id': stored_obj.id,
-                        })
-
-                return True
 
         return super(LeihAdmission, self).write(vals)
 
