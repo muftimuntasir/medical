@@ -18,6 +18,7 @@ access_blood_product_lens,product.lens,model_product_lens,base.group_user,1,1,1,
 access_patient_info,patient.info,model_patient_info,base.group_user,1,1,1,1
 access_optics_sale,optics.sale,model_optics_sale,base.group_user,1,1,1,1
 access_optics_lens_sale_line,optics.lens.sale.line,model_optics_lens_sale_line,base.group_user,1,1,1,1
+access_optics_sale_payment,optics.sale.payment,model_optics_sale_payment,base.group_user,1,1,1,1
 access_optics_sale_payment_line,optics.sale.payment.line,model_optics_sale_payment_line,base.group_user,1,1,1,1
 
 access_advance_cash,advance.cash,model_advance_cash,base.group_user,1,1,1,1

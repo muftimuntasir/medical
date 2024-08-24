@@ -30,6 +30,7 @@
         'views/patients_view.xml',
         'views/products_lens_view.xml',
         'views/optics_sale_view.xml',
+        'views/optics_sale_payment_views.xml',
         'views/advance_cash_view.xml',
         'views/bill_register_view.xml',
         'views/broker_info_view.xml',

@@ -24,3 +24,4 @@ from . import inventory_requisition
 from . import money_receipt
 from . import bill_register_payment
 from . import admission_payment
+from . import optics_sale_payment
