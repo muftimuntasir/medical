@@ -86,8 +86,8 @@ class InventoryProductEntry(models.Model):
                     'product_id': line.product_name.id,
                     'product_uom_qty': line.quantity,
                     'product_uom': line.product_name.uom_id.id,
-                    'location_id': entry.warehouse_id.lot_stock_id.id,
-                    'location_dest_id': entry.partner_id.property_stock_customer.id,
+                    'location_id': entry.partner_id.property_stock_customer.id,
+                    'location_dest_id': entry.warehouse_id.lot_stock_id.id,
                 }
                 move_ids.append((0, 0, move_line_vals))
 
