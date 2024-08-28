@@ -1,4 +1,4 @@
-
+from odoo.exceptions import UserError
 from odoo import api, models, fields, _
 
 
@@ -152,6 +152,41 @@ class OpticsSale(models.Model):
         return True
 
     def bill_confirm(self):
+
+
+        if self.state == 'confirmed':
+            raise UserError(_('Already this Bill is Confirmed.'))
+
+        if self.paid > self.total:
+            raise UserError(_('You paid more than the TOTAL AMOUNT'))
+
+
+        if self.paid:
+            vals ={'account_number': False,
+             'amount': self.paid,
+             'date': self.date,
+             'payment_type': 1,
+             'optics_sale_id': self.id,
+             'service_charge': 0,
+             'to_be_paid': self.due}
+
+            optics_payment_id = self.env['optics.sale.payment'].create(vals)
+
+            mr_id = optics_payment_id._creation_of_money_receipt()
+            if mr_id:
+                mr_id.name = f'MR#{mr_id.id}'
+
+                optics_payment_id.money_receipt_id = mr_id.id
+                optics_payment_id._creation_of_optic_sale_payment_line()
+
+                j_id = optics_payment_id._create_journal_entry(amount=self.paid, cr_act_id=1, dr_act_id=1,
+                                                  bill_no=self.name, line_label=f'MR#{mr_id.id}')
+                self.env.cr.execute("UPDATE leih_money_receipt SET journal_id=%s WHERE id=%s",
+                                    (j_id.id, mr_id.id))
+
+        self.write({'state': 'activated'})
+
+
         return True
 
     #
