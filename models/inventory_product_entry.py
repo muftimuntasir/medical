@@ -14,12 +14,12 @@ class InventoryProductEntry(models.Model):
     reference_no = fields.Char("Reference No")
     total = fields.Float("Total Amount")
     partner_id = fields.Many2one('res.partner', 'Employee Name', required=True)
-    grn_id = fields.Many2one('stock.picking', 'GRN NO')
     grn_journal_id = fields.Many2one('account.move', 'GRN Journal')
     advance_journal_id = fields.Many2one('account.move', 'Advance Journal')
     warehouse_id = fields.Many2one('stock.warehouse', 'Warehouse Location', required=True)
     inventory_product_entry_line_ids = fields.One2many('inventory.product.entry.line', 'inventory_product_entry_id', string="Inventory Requisition Items", required=True)
     date = fields.Date('Entry Date')
+    picking_id=fields.Many2one("stock.picking", string="Picking ID")
     state = fields.Selection(
         [('pending', 'Pending'), ('confirmed', 'Receive Product'), ('verify', 'Verified'), ('cancelled', 'Cancelled')],
         'Status', default='pending', readonly=True
@@ -72,9 +72,9 @@ class InventoryProductEntry(models.Model):
             # Prepare stock picking values for the transfer
             picking_vals = {
                 'partner_id': entry.partner_id.id,
-                'location_id': entry.warehouse_id.lot_stock_id.id,  # Source location (stock)
-                'location_dest_id': entry.partner_id.property_stock_customer.id,  # Destination location (customer)
-                'picking_type_id': self.env.ref('stock.picking_type_out').id,  # Delivery Order type
+                'location_id': entry.partner_id.property_stock_supplier.id,  # Source location (stock)
+                'location_dest_id': entry.warehouse_id.lot_stock_id.id,  # Destination location (customer)
+                'picking_type_id': self.env.ref('stock.picking_type_in').id,  # Receipt type
                 'origin': entry.name,
                 'move_ids': [],
             }
@@ -100,6 +100,7 @@ class InventoryProductEntry(models.Model):
             picking.action_confirm()
             picking.action_assign()
             picking.button_validate()
+            self.picking_id=picking
 
             # Update the entry state to 'confirmed'
             entry.state = 'confirmed'

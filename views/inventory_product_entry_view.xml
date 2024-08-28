@@ -42,6 +42,7 @@
                     <group>
                         <field name="partner_id"/>
                         <field name="warehouse_id"/>
+                        <field name="picking_id"/>
                         <field name="total"/>
                         <field name="state"/>
 
@@ -93,7 +94,7 @@
                 <field name="name"/>
                 <field name="date"/>
                 <field name="reference_no"/>
-                <field name="grn_id"/>
+                <field name="picking_id"/>
                 <field name="grn_journal_id"/>
                 <field name="advance_journal_id"/>
                 <field name="state"/>
