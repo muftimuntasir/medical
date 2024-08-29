@@ -28,7 +28,6 @@ class InventoryRequisition(models.Model):
             if record.state == 'confirmed':
                 raise UserError(_('Sorry, it is already confirmed'))
 
-            import pdb;pdb.set_trace()
 
             picking_vals = {
                 'partner_id': record.partner_id.id,

@@ -1,3 +1,5 @@
+
+
 from odoo.exceptions import UserError
 from odoo import api, models, fields, _
 
@@ -184,10 +186,74 @@ class OpticsSale(models.Model):
                 self.env.cr.execute("UPDATE leih_money_receipt SET journal_id=%s WHERE id=%s",
                                     (j_id.id, mr_id.id))
 
-        self.write({'state': 'activated'})
+        if self.frame_id:
+            # import pdb;pdb.set_trace()
+            optics_configuration_id=self.env["optics.sale.configuration"].browse(1)
+
+            picking_vals = {
+                'partner_id':1,
+                'location_id': optics_configuration_id.location_id.id,  # Source location (stock)
+                'location_dest_id': 5,  # Destination location (customer)
+                'picking_type_id': self.env.ref('stock.picking_type_out').id,  # Receipt type
+                'origin': self.name,
+                'move_ids': [],
+            }
+            move_ids = []
+
+            move_line_vals = {
+                'name': self.frame_id.name,
+                'product_id': self.frame_id.id,
+                'product_uom_qty': self.quantity,
+                'product_uom': self.frame_id.uom_id.id,
+                'location_id': optics_configuration_id.location_id.id,
+                'location_dest_id':5,
+            }
+            move_ids.append((0, 0, move_line_vals))
+            if self.cell_pad:
+                move_line_vals = {
+                    'name': optics_configuration_id.cell_pad_prod_id.name,
+                    'product_id': optics_configuration_id.cell_pad_prod_id.id,
+                    'product_uom_qty': self.quantity,
+                    'product_uom': optics_configuration_id.cell_pad_prod_id.uom_id.id,
+                    'location_id': optics_configuration_id.location_id.id,
+                    'location_dest_id': 5,
+                }
+                move_ids.append((0, 0, move_line_vals))
+
+            if self.hard_cover:
+                move_line_vals = {
+                    'name': optics_configuration_id.hard_cover_prod_id.name,
+                    'product_id': optics_configuration_id.hard_cover_prod_id.id,
+                    'product_uom_qty': self.quantity,
+                    'product_uom': optics_configuration_id.hard_cover_prod_id.uom_id.id,
+                    'location_id': optics_configuration_id.location_id.id,
+                    'location_dest_id': 5,
+                }
+                move_ids.append((0, 0, move_line_vals))
+            for opt_line in self.optics_lens_sale_line_id:
+                if opt_line:
+                    move_line_vals = {
+                        'name': optics_configuration_id.lense_prod_id.name,
+                        'product_id': optics_configuration_id.lense_prod_id.id,
+                        'product_uom_qty': opt_line.qty,
+                        'product_uom': optics_configuration_id.lense_prod_id.uom_id.id,
+                        'location_id': optics_configuration_id.location_id.id,
+                        'location_dest_id': 5,
+                    }
+                    move_ids.append((0, 0, move_line_vals))
+
+
+
+            picking_vals['move_ids'] = move_ids
+            # Create the stock picking record
+            picking = self.env['stock.picking'].create(picking_vals)
+            picking.action_confirm()
+            picking.action_assign()
+            picking.button_validate()
 
 
         return True
+
 
     #
     # # if same item exist in line
@@ -601,3 +667,16 @@ class OpticsSalePaymentLine(models.Model):
     card_no= fields.Char('Card Number')
     bank_name= fields.Char('Bank Name')
     money_receipt_id= fields.Many2one('leih.money.receipt', 'Money Receipt ID')
+
+
+
+class OpticsSaleConfiguration(models.Model):
+    _name = "optics.sale.configuration"
+    _description = "Optics Sales Configuration"
+    _order = 'id desc'
+
+    name= fields.Char("Name")
+    location_id=fields.Many2one("stock.location", string="Location ID")
+    cell_pad_prod_id=fields.Many2one("product.product", string="Cell Pad Product ID")
+    hard_cover_prod_id=fields.Many2one("product.product", string="Hard Cover Product ID")
+    lense_prod_id=fields.Many2one("product.product", string="Lense Product ID")

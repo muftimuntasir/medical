@@ -7,7 +7,7 @@
             <field name="name">optics.sale.views</field>
             <field name="model">optics.sale</field>
             <field name="arch" type="xml">
-                <form string="Investigation">
+                <form string="Optics Sale">
                     <header>
 
                         <!--                        <button string="Add Test" type="object" name="add_new_test" groups="base.group_user"/>-->
@@ -129,7 +129,7 @@
             <field name="name">leih</field>
             <field name="model">optics.sale</field>
             <field name="arch" type="xml">
-                <tree string="Alu List">
+                <tree string="List">
 
                     <field name="name"/>
                     <field name="date"/>
@@ -148,16 +148,76 @@
         </record>
 
 
-        <!--        <menuitem name="Doctors" id="leih_doctors_menu" parent="leih_menu"/>-->
-        <!--        <menuitem name="Billing" id="leih_billing_menu" parent="leih_menu" sequence="2"/>-->
-        <!--            <menuitem name="Optics Sale" id="optics_sale_menu_mainform" parent="leih_billing_menu" action="optics_sale_action" groups="leih.group_billing_menu_optics_sale"/>-->
-
-        <menuitem id="menu_diagnosis_department"
+        <menuitem id="menu_optics"
                   name="Optics Sale"
                   sequence="12"
                   parent="medical.menu_medical"
+        />
+        <menuitem id="menu_optics_sale"
+                  name="Optics Sale"
+                  sequence="1"
+                  parent="medical.menu_optics"
                   action="optics_sale_action"
         />
+
+
+        <!--        optics payment configuration-->
+        <record id="optics_sale_configuration_view" model="ir.ui.view">
+            <field name="name">optics.sale.configuration.views</field>
+            <field name="model">optics.sale.configuration</field>
+            <field name="arch" type="xml">
+                <form string="Optics Sale Configuration">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="location_id"/>
+                            <field name="cell_pad_prod_id"/>
+                            <field name="hard_cover_prod_id"/>
+                            <field name="lense_prod_id"/>
+                        </group>
+
+
+                    </sheet>
+                </form>
+
+            </field>
+
+        </record>
+
+
+        <record id="optics_sale_configuration_action" model="ir.actions.act_window">
+            <field name="name">Optics Sale Configuration</field>
+            <field name="res_model">optics.sale.configuration</field>
+            <field name="type">ir.actions.act_window</field>
+
+            <field name="view_mode">tree,form,graph</field>
+            <field name="context">{}</field>
+        </record>
+
+        <record model="ir.ui.view" id="optics_sale_configuration_tree">
+            <field name="name">Optics Sale Configuration</field>
+            <field name="model">optics.sale.configuration</field>
+            <field name="arch" type="xml">
+                <tree string="List">
+
+                                                <field name="name"/>
+                                                <field name="location_id"/>
+                            <field name="cell_pad_prod_id"/>
+                            <field name="hard_cover_prod_id"/>
+                            <field name="lense_prod_id"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_optics_sale_configuration"
+                  name="Optics Sale Configuration"
+                  sequence="2"
+                  parent="medical.menu_optics"
+                  action="optics_sale_configuration_action"
+        />
+
 
     </data>
 
